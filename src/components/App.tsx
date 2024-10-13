@@ -17,14 +17,14 @@ const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const saveTokens = (accessToken: string, expiresIn: number, refreshToken: string | null) => {
-    const expirationTime = Date.now() + expiresIn * 1000; // Convert to milliseconds
+    const expirationTime = Date.now() + expiresIn * 1000; // Expiration time in ms
     localStorage.setItem('googleAccessToken', accessToken);
     localStorage.setItem('tokenExpiration', expirationTime.toString());
     if (refreshToken) {
-      localStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem('googleRefreshToken', refreshToken);
     }
   };
-  
+
   useEffect(() => {
     // const params = new URLSearchParams(window.location.search);
     // const token = params.get('accessToken');
@@ -69,6 +69,52 @@ const App: React.FC = () => {
 };
 
 export default App;
+
+/*
+const refreshAccessToken = async () => {
+  const refreshToken = localStorage.getItem('googleRefreshToken');
+
+  if (!refreshToken) {
+    console.log('No refresh token found. Redirecting to login...');
+    window.location.href = '/auth/google';
+    return;
+  }
+
+  try {
+    const response = await fetch('http://localhost:8080/refresh-token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      saveTokens(data.accessToken, data.expiresIn, refreshToken);
+      console.log('Access token refreshed!');
+    } else {
+      console.log('Failed to refresh token. Redirecting to login...');
+      window.location.href = '/auth/google';
+    }
+  } catch (error) {
+    console.error('Error refreshing token:', error);
+    window.location.href = '/auth/google';
+  }
+};
+
+const isTokenExpired = (): boolean => {
+  const expiration = localStorage.getItem('tokenExpiration');
+  if (!expiration) return true; // Treat as expired if not found
+  return Date.now() > parseInt(expiration);
+};
+
+const getAccessToken = async () => {
+  if (isTokenExpired()) {
+    await refreshAccessToken();
+  }
+  return localStorage.getItem('googleAccessToken');
+};
+*/
+
 /*
 import * as React from 'react';
 import { bindActionCreators } from 'redux';
@@ -250,3 +296,4 @@ const mapDispatchToProps = (dispatch: TedTaggerDispatch) => {
 export default connect(mapStateToProps, mapDispatchToProps)(App);
 
 */
+
