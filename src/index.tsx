@@ -11,9 +11,9 @@ import { rootReducer } from './models';
 import App from './components/App';
 
 import { composeWithDevTools } from 'redux-devtools-extension';
-// import { initializeDiagnostics } from './utilities';
+import { initializeDiagnostics } from './utilities';
 
-// initializeDiagnostics();
+initializeDiagnostics();
 
 export const store = createStore(
   rootReducer,
