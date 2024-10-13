@@ -1,3 +1,29 @@
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const App: React.FC = () => {
+  // const navigate = useNavigate();
+
+  // useEffect(() => {
+  //   const queryParams = new URLSearchParams(window.location.search);
+  //   const accessToken = queryParams.get('accessToken');
+
+  //   if (accessToken) {
+  //     localStorage.setItem('googleAccessToken', accessToken);
+  //   } else {
+  //     navigate('/');
+  //   }
+  // }, [navigate]);
+
+  return (
+    <button onClick={() => window.location.href = 'http://localhost:8080/auth/google'}>
+      Connect with Google
+    </button>
+  );
+};
+
+export default App;
+/*
 import * as React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -177,3 +203,4 @@ const mapDispatchToProps = (dispatch: TedTaggerDispatch) => {
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
 
+*/
