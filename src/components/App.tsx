@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const App: React.FC = () => {
@@ -14,14 +14,41 @@ const App: React.FC = () => {
   //     navigate('/');
   //   }
   // }, [navigate]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get('accessToken');
-    console.log('token', token);
-    if (token) {
-      localStorage.setItem('googleAccessToken', token);
+  const saveTokens = (accessToken: string, expiresIn: number, refreshToken: string | null) => {
+    const expirationTime = Date.now() + expiresIn * 1000; // Convert to milliseconds
+    localStorage.setItem('googleAccessToken', accessToken);
+    localStorage.setItem('tokenExpiration', expirationTime.toString());
+    if (refreshToken) {
+      localStorage.setItem('refreshToken', refreshToken);
     }
+  };
+  
+  useEffect(() => {
+    // const params = new URLSearchParams(window.location.search);
+    // const token = params.get('accessToken');
+    // console.log('token', token);
+    // if (token) {
+    //   localStorage.setItem('googleAccessToken', token);
+    // }
+    // Check for tokens in the URL query parameters
+    const params = new URLSearchParams(window.location.search);
+    const accessToken = params.get('accessToken');
+    const expiresIn = params.get('expiresIn');
+    const refreshToken = params.get('refreshToken');
+
+    console.log('accessToken', accessToken);
+    console.log('expiresIn', expiresIn);
+    console.log('refreshToken', refreshToken);
+    
+    if (accessToken && expiresIn) {
+      saveTokens(accessToken, parseInt(expiresIn), refreshToken);
+      setIsLoggedIn(true);
+      // Clear query parameters from the URL
+      window.history.replaceState({}, document.title, '/');
+    }
+
   }, []);
 
   return (
