@@ -15,6 +15,15 @@ const App: React.FC = () => {
   //   }
   // }, [navigate]);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('accessToken');
+    console.log('token', token);
+    if (token) {
+      localStorage.setItem('googleAccessToken', token);
+    }
+  }, []);
+
   return (
     <button onClick={() => window.location.href = 'http://localhost:8080/auth/google'}>
       Connect with Google
