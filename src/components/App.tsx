@@ -41,7 +41,7 @@ const App: React.FC = () => {
     console.log('accessToken', accessToken);
     console.log('expiresIn', expiresIn);
     console.log('refreshToken', refreshToken);
-    
+
     if (accessToken && expiresIn) {
       saveTokens(accessToken, parseInt(expiresIn), refreshToken);
       setIsLoggedIn(true);
@@ -51,10 +51,20 @@ const App: React.FC = () => {
 
   }, []);
 
+  // return (
+  //   <button onClick={() => window.location.href = 'http://localhost:8080/auth/google'}>
+  //     Connect with Google
+  //   </button>
+  // );
+
   return (
-    <button onClick={() => window.location.href = 'http://localhost:8080/auth/google'}>
-      Connect with Google
-    </button>
+    <div>
+      {isLoggedIn ? (
+        <p>Logged in successfully! Access token saved.</p>
+      ) : (
+        <a href="/auth/google">Login with Google</a>
+      )}
+    </div>
   );
 };
 
