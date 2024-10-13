@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import '../styles/TedTagger.css';
-import { loadMediaItems, loadKeywordData, loadTakeouts, importFromTakeout, loadDeletedMediaItems, loadLocalStorageFolders, importFromLocalStorage } from '../controllers';
+import { loadMediaItems, loadKeywordData, loadTakeouts, importFromTakeout, loadDeletedMediaItems, loadLocalStorageFolders, importFromLocalStorage, authenticate } from '../controllers';
 import { TedTaggerDispatch, setAppInitialized } from '../models';
 import { getKeywordRootNodeId, getPhotoLayout } from '../selectors';
 import { Button } from '@mui/material';
@@ -29,6 +29,7 @@ export interface AppProps {
   keywordRootNodeId: string;
   onImportFromTakeout: (id: string) => void;
   onImportFromLocalStorage: (folder: string) => void;
+  onAuthenticate: () => any;
 }
 
 const App = (props: AppProps) => {
@@ -55,6 +56,10 @@ const App = (props: AppProps) => {
 
   const handleCloseImportFromLocalStorageDialog = () => {
     setShowImportFromLocalStorageDialog(false);
+  };
+
+  const handleAuthenticate = () => {
+    props.onAuthenticate();
   };
 
   // React.useEffect(() => {
@@ -141,7 +146,11 @@ const App = (props: AppProps) => {
 
   // );
   return (
-    <div>Pizza</div>
+    <div>
+      Pizza
+      <Button onClick={handleAuthenticate}>Connect to Google</Button>
+
+    </div>
   );
 };
 
@@ -162,6 +171,7 @@ const mapDispatchToProps = (dispatch: TedTaggerDispatch) => {
     onLoadLocalStorages: loadLocalStorageFolders,
     onImportFromTakeout: importFromTakeout,
     onImportFromLocalStorage: importFromLocalStorage,
+    onAuthenticate: authenticate
   }, dispatch);
 };
 
