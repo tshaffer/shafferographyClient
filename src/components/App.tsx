@@ -39,29 +39,69 @@ const App = (props: AppProps) => {
   const [showImportFromTakeoutDialog, setShowImportFromTakeoutDialog] = React.useState(false);
   const [showImportFromLocalStorageDialog, setShowImportFromLocalStorageDialog] = React.useState(false);
 
-  const saveTokens = (accessToken: string, expiresIn: number, refreshToken: string | null) => {
-    const expirationTime = Date.now() + expiresIn * 1000; // Expiration time in ms
+  // Save the access token, expiration, and Google ID in localStorage
+  const saveTokens = (accessToken: string, expiresIn: number, googleId: string) => {
+    const expirationTime = Date.now() + expiresIn * 1000; // Convert to ms
     localStorage.setItem('googleAccessToken', accessToken);
     localStorage.setItem('tokenExpiration', expirationTime.toString());
-    if (refreshToken) {
-      localStorage.setItem('googleRefreshToken', refreshToken);
+    localStorage.setItem('googleId', googleId); // Store Google ID
+  };
+
+  // Check if the access token is expired
+  const isTokenExpired = (): boolean => {
+    const expiration = localStorage.getItem('tokenExpiration');
+    return !expiration || Date.now() > parseInt(expiration);
+  };
+
+  // Refresh the access token using the Google ID
+  const refreshAccessToken = async () => {
+    const googleId = localStorage.getItem('googleId'); // Retrieve Google ID
+
+    if (!googleId) {
+      console.error('No Google ID found. Redirecting to login...');
+      window.location.href = '/auth/google';
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:8080/refresh-token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ googleId }),
+      });
+
+      if (response.ok) {
+        const { accessToken, expiresIn } = await response.json();
+        saveTokens(accessToken, expiresIn, googleId); // Save the new access token
+        setIsLoggedIn(true); // Update the state
+      } else {
+        console.error('Failed to refresh access token. Redirecting to login...');
+        window.location.href = '/auth/google'; // Re-authenticate if refresh fails
+      }
+    } catch (error) {
+      console.error('Error refreshing access token:', error);
+      window.location.href = '/auth/google';
     }
   };
 
+  // Main useEffect to handle authentication and token refreshing
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const accessToken = params.get('accessToken');
     const expiresIn = params.get('expiresIn');
-    const refreshToken = params.get('refreshToken');
+    const googleId = params.get('googleId'); // Extract Google ID from query params
 
-    console.log('accessToken', accessToken);
-    console.log('expiresIn', expiresIn);
-    console.log('refreshToken', refreshToken);
-
-    if (accessToken && expiresIn) {
-      saveTokens(accessToken, parseInt(expiresIn), refreshToken);
+    if (accessToken && expiresIn && googleId) {
+      // Save tokens on first login
+      saveTokens(accessToken, parseInt(expiresIn), googleId);
       setIsLoggedIn(true);
-      window.history.replaceState({}, document.title, '/');
+      window.history.replaceState({}, document.title, '/'); // Clear query params
+    } else if (isTokenExpired()) {
+      // Refresh the token if expired
+      refreshAccessToken();
+    } else {
+      // If tokens are valid, set the user as logged in
+      setIsLoggedIn(true);
     }
   }, []);
 
@@ -83,6 +123,10 @@ const App = (props: AppProps) => {
   if (!isLoggedIn) {
     return (
       <a href="/auth/google">Login with Google</a>
+    );
+  } else {
+    return (
+      <div>pizza</div>
     );
   }
 
