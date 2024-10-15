@@ -65,25 +65,26 @@ const App = (props: AppProps) => {
     try {
       const response = await fetch('http://localhost:8080/auth/token', {
         method: 'GET',
-        credentials: 'include', // Include cookies in the request
+        credentials: 'include', // Include HTTP-only cookies
       });
-
+  
       if (response.ok) {
         const data = await response.json();
-        const { accessToken } = data;
+        const { accessToken, googleId } = data;
+  
         console.log('Access token fetched:', accessToken);
-
-        const googleId = localStorage.getItem('googleId') || 'unknown-user'; // Fallback if googleId is missing
-        const expiresIn = 3600; // 1 hour token validity (you can adjust this)
-
-        // Save the fetched token to localStorage
+        console.log('Google ID fetched:', googleId);
+  
+        const expiresIn = 3600; // 1 hour validity
+  
+        // Save the token and Google ID to localStorage
         saveTokens(accessToken, expiresIn, googleId);
-
+  
         setAccessToken(accessToken);
         setIsLoggedIn(true);
       } else {
         console.warn('No valid access token found. Attempting to refresh...');
-        refreshAccessToken(); // Try refreshing the token if fetching fails
+        refreshAccessToken(); // Try refreshing if fetching fails
       }
     } catch (error) {
       console.error('Error fetching access token:', error);
