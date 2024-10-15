@@ -84,9 +84,9 @@ const App = (props: AppProps) => {
     const googleId = localStorage.getItem('googleId');
 
     if (!googleId) {
-      console.error('No Google ID found. Logging out...');
-      logout();
-      return;
+      console.error('No Google ID found. Unable to refresh token.');
+      setIsLoggedIn(false); // Set user as logged out but avoid redirect
+      return; // Prevent further execution to avoid a loop
     }
 
     try {
@@ -98,9 +98,9 @@ const App = (props: AppProps) => {
 
       if (response.ok) {
         const { accessToken, expiresIn } = await response.json();
-        saveTokens(accessToken, expiresIn, googleId); // Save new tokens
-        setAccessToken(accessToken);
+        saveTokens(accessToken, expiresIn, googleId);
         setIsLoggedIn(true);
+        setAccessToken(accessToken); // Update state with the new token
       } else {
         console.warn('Failed to refresh access token. Logging out...');
         logout();
