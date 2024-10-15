@@ -95,22 +95,27 @@ const App = (props: AppProps) => {
 
   // Main useEffect to handle authentication and token refreshing
   useEffect(() => {
+    debugger;
     const params = new URLSearchParams(window.location.search);
     const accessToken = params.get('accessToken');
     const expiresIn = params.get('expiresIn');
     const googleId = params.get('googleId');
-
+    const lastGoogleId = localStorage.getItem('googleId'); // Previous user ID
+  
+    // Detect user switch and clear storage if different user logs in
+    if (googleId && googleId !== lastGoogleId) {
+      console.log('Detected user switch. Clearing localStorage.');
+      localStorage.clear();
+    }
+  
     if (accessToken && expiresIn && googleId) {
-      // Save tokens on first login
       saveTokens(accessToken, parseInt(expiresIn), googleId);
       setIsLoggedIn(true);
       window.history.replaceState({}, document.title, '/'); // Clear query params
     } else if (isTokenExpired()) {
-      // If token is expired or missing, log the user out
-      console.log('Token expired or missing. Logging out...');
+      console.warn('Token expired or missing. Logging out...');
       logout();
     } else {
-      // If tokens are valid, set the user as logged in
       setIsLoggedIn(true);
     }
   }, []);
