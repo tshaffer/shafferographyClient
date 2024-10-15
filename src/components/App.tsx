@@ -42,10 +42,11 @@ const App = (props: AppProps) => {
 
   // Save the access token, expiration, and Google ID in localStorage
   const saveTokens = (token: string, expiresIn: number, googleId: string) => {
-    const expirationTime = Date.now() + expiresIn * 1000; // Convert to ms
+    const expirationTime = Date.now() + expiresIn * 1000; // Convert to milliseconds
     localStorage.setItem('googleAccessToken', token);
     localStorage.setItem('tokenExpiration', expirationTime.toString());
     localStorage.setItem('googleId', googleId);
+    console.log('Tokens saved successfully.');
   };
 
   // Check if the access token is expired
@@ -53,7 +54,7 @@ const App = (props: AppProps) => {
     const accessToken = localStorage.getItem('googleAccessToken');
     const expiration = localStorage.getItem('tokenExpiration');
 
-    // Return true if the access token or expiration time is missing, or if the token is expired
+    // Return true if the access token or expiration is missing, or if the token has expired
     return !accessToken || !expiration || Date.now() > parseInt(expiration);
   };
 
@@ -62,31 +63,33 @@ const App = (props: AppProps) => {
     try {
       const response = await fetch('http://localHost:8080/auth/token', {
         method: 'GET',
-        credentials: 'include',
+        credentials: 'include', // Include HTTP-only cookies
       });
 
       if (response.ok) {
         const data = await response.json();
-        setAccessToken(data.accessToken);
+        const { accessToken } = data;
+        console.log('Access token fetched:', accessToken);
+        setAccessToken(accessToken);
         setIsLoggedIn(true);
       } else {
         console.warn('No valid access token found. Attempting to refresh...');
-        refreshAccessToken();
+        refreshAccessToken(); // Try to refresh if the access token is missing
       }
     } catch (error) {
       console.error('Error fetching access token:', error);
-      logout();
+      logout(); // Logout if token fetching fails
     }
   };
-
+  
   // Refresh the access token using the refresh token endpoint
   const refreshAccessToken = async () => {
     const googleId = localStorage.getItem('googleId');
 
     if (!googleId) {
       console.error('No Google ID found. Unable to refresh token.');
-      setIsLoggedIn(false); // Set user as logged out but avoid redirect
-      return; // Prevent further execution to avoid a loop
+      setIsLoggedIn(false); // Set user as logged out without triggering a redirect loop
+      return; // Prevent further execution
     }
 
     try {
@@ -98,9 +101,10 @@ const App = (props: AppProps) => {
 
       if (response.ok) {
         const { accessToken, expiresIn } = await response.json();
+        console.log('Token refreshed successfully:', accessToken);
         saveTokens(accessToken, expiresIn, googleId);
+        setAccessToken(accessToken);
         setIsLoggedIn(true);
-        setAccessToken(accessToken); // Update state with the new token
       } else {
         console.warn('Failed to refresh access token. Logging out...');
         logout();
@@ -110,57 +114,65 @@ const App = (props: AppProps) => {
       logout();
     }
   };
-
+  
   // Logout function to clear localStorage and reload the app
   const logout = () => {
-    localStorage.clear();
-    setIsLoggedIn(false);
-    window.location.href = '/';
+    console.log('Logging out...');
+    localStorage.clear(); // Clear all localStorage data
+    setIsLoggedIn(false); // Set state to logged out
+    window.location.href = '/'; // Redirect to the home or login page
   };
 
   useEffect(() => {
-    debugger;
     const params = new URLSearchParams(window.location.search);
     const accessToken = params.get('accessToken');
     const expiresIn = params.get('expiresIn');
     const googleId = params.get('googleId');
     const lastGoogleId = localStorage.getItem('googleId');
     const loggedOut = localStorage.getItem('loggedOut'); // Check if user is logged out
-
+  
     console.log('useEffect triggered.');
     console.log('accessToken:', accessToken);
     console.log('expiresIn:', expiresIn);
     console.log('googleId:', googleId);
     console.log('lastGoogleId:', lastGoogleId);
     console.log('loggedOut:', loggedOut);
-
-    // Clear loggedOut flag if set
+  
+    // Clear loggedOut flag if present
     if (loggedOut === 'true') {
       console.log('User already logged out.');
       localStorage.removeItem('loggedOut');
+      setIsLoggedIn(false);
       return; // Prevent further execution
     }
-
-    // Handle user switch
+  
+    // Handle user switch by clearing localStorage if a new Google ID is detected
     if (googleId && googleId !== lastGoogleId) {
       console.log('Detected user switch. Clearing localStorage.');
       localStorage.clear();
     }
-
-    // Save tokens if available in query params
+  
+    // Save tokens if they exist in the query parameters
     if (accessToken && expiresIn && googleId) {
       saveTokens(accessToken, parseInt(expiresIn), googleId);
       setIsLoggedIn(true);
-      window.history.replaceState({}, document.title, '/'); // Clear query params
-    } else if (isTokenExpired()) {
-      console.warn('Token expired or missing. Attempting to refresh...');
-      refreshAccessToken(); // Try to refresh token instead of logging out
+      window.history.replaceState({}, document.title, '/'); // Clear query params from the URL
+    } 
+    // If the token is expired or missing, attempt to refresh it
+    else if (isTokenExpired()) {
+      const savedGoogleId = localStorage.getItem('googleId');
+      if (savedGoogleId) {
+        console.warn('Token expired or missing. Attempting to refresh...');
+        refreshAccessToken();
+      } else {
+        console.warn('No valid session found. Displaying login prompt.');
+        setIsLoggedIn(false); // Set state to logged out without looping
+      }
     } else {
       console.log('Tokens are valid. User is logged in.');
       setIsLoggedIn(true);
     }
   }, []);
-
 
   // useEffect to manage authentication on page load
   /*
