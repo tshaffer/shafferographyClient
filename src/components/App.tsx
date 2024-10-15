@@ -169,101 +169,8 @@ const App = (props: AppProps) => {
       setIsLoggedIn(true);
     }
   }, []);
-  // useEffect to manage authentication on page load
-  /*
-  useEffect(() => {
-    if (isTokenExpired()) {
-      console.warn('Token expired or missing. Attempting to refresh...');
-      refreshAccessToken();
-    } else {
-      fetchAccessToken(); // Fetch access token if not expired
-    }
-  }, []);
-
-
-  return (
-    <div>
-      {isLoggedIn ? (
-        <p>Logged in! Access Token: {accessToken}</p>
-      ) : (
-        <a href="/auth/google">Login with Google</a>
-      )}
-    </div>
-  );
-};
-
-  // Refresh the access token using the Google ID
-  const refreshAccessToken = async () => {
-    const googleId = localStorage.getItem('googleId'); // Retrieve Google ID
-
-    if (!googleId) {
-      console.error('No Google ID found. Redirecting to login...');
-      window.location.href = '/auth/google';
-      return;
-    }
-
-    try {
-      const response = await fetch('http://localhost:8080/refresh-token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ googleId }),
-      });
-
-      if (response.ok) {
-        const { accessToken, expiresIn } = await response.json();
-        saveTokens(accessToken, expiresIn, googleId); // Save the new access token
-        setIsLoggedIn(true); // Update the state
-      } else {
-        console.error('Failed to refresh access token. Redirecting to login...');
-        window.location.href = '/auth/google'; // Re-authenticate if refresh fails
-      }
-    } catch (error) {
-      console.error('Error refreshing access token:', error);
-      window.location.href = '/auth/google';
-    }
-  };
-  */
 
   // Main useEffect to handle authentication and token refreshing
-  // useEffect(() => {
-  //   const params = new URLSearchParams(window.location.search);
-  //   const accessToken = params.get('accessToken');
-  //   const expiresIn = params.get('expiresIn');
-  //   const googleId = params.get('googleId');
-  //   const lastGoogleId = localStorage.getItem('googleId'); // Previous user ID
-  //   const loggedOut = localStorage.getItem('loggedOut'); // Check if user is logged out
-
-  //   console.log('useEffect triggered.');
-  //   console.log('accessToken:', accessToken);
-  //   console.log('expiresIn:', expiresIn);
-  //   console.log('googleId:', googleId);
-  //   console.log('lastGoogleId:', lastGoogleId);
-  //   console.log('loggedOut:', loggedOut);
-
-  //   // Clear loggedOut flag once the page reloads
-  //   if (loggedOut === 'true') {
-  //     console.log('User already logged out.');
-  //     localStorage.removeItem('loggedOut');
-  //     return; // Prevent further execution
-  //   }
-
-  //   if (googleId && googleId !== lastGoogleId) {
-  //     console.log('Detected user switch. Clearing localStorage.');
-  //     localStorage.clear();
-  //   }
-
-  //   if (accessToken && expiresIn && googleId) {
-  //     saveTokens(accessToken, parseInt(expiresIn), googleId);
-  //     setIsLoggedIn(true);
-  //     window.history.replaceState({}, document.title, '/'); // Clear query params
-  //   } else if (isTokenExpired()) {
-  //     console.warn('Token expired or missing. Logging out...');
-  //     logout();
-  //   } else {
-  //     setIsLoggedIn(true); // Tokens are valid, set user as logged in
-  //   }
-  // }, []);
-
   // React.useEffect(() => {
   //   props.onLoadKeywordData()
   //     .then(function () {
@@ -401,50 +308,6 @@ const mapDispatchToProps = (dispatch: TedTaggerDispatch) => {
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
 
-/*
-const refreshAccessToken = async () => {
-  const refreshToken = localStorage.getItem('googleRefreshToken');
-
-  if (!refreshToken) {
-    console.log('No refresh token found. Redirecting to login...');
-    window.location.href = '/auth/google';
-    return;
-  }
-
-  try {
-    const response = await fetch('http://localhost:8080/refresh-token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken }),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      saveTokens(data.accessToken, data.expiresIn, refreshToken);
-      console.log('Access token refreshed!');
-    } else {
-      console.log('Failed to refresh token. Redirecting to login...');
-      window.location.href = '/auth/google';
-    }
-  } catch (error) {
-    console.error('Error refreshing token:', error);
-    window.location.href = '/auth/google';
-  }
-};
-
-const isTokenExpired = (): boolean => {
-  const expiration = localStorage.getItem('tokenExpiration');
-  if (!expiration) return true; // Treat as expired if not found
-  return Date.now() > parseInt(expiration);
-};
-
-const getAccessToken = async () => {
-  if (isTokenExpired()) {
-    await refreshAccessToken();
-  }
-  return localStorage.getItem('googleAccessToken');
-};
-*/
 
 /*
 import * as React from 'react';
