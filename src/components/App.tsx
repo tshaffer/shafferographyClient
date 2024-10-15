@@ -60,12 +60,13 @@ const App = (props: AppProps) => {
 
   // Fetch the access token from the cookie
   const fetchAccessToken = async () => {
+    console.log('Fetching access token from /auth/token...');
     try {
-      const response = await fetch('http://localHost:8080/auth/token', {
+      const response = await fetch('http://localhost:8080/auth/token', {
         method: 'GET',
-        credentials: 'include', // Include HTTP-only cookies
+        credentials: 'include', // Ensure cookies are included
       });
-
+  
       if (response.ok) {
         const data = await response.json();
         const { accessToken } = data;
@@ -74,14 +75,14 @@ const App = (props: AppProps) => {
         setIsLoggedIn(true);
       } else {
         console.warn('No valid access token found. Attempting to refresh...');
-        refreshAccessToken(); // Try to refresh if the access token is missing
+        refreshAccessToken(); // Try refreshing the token if not found
       }
     } catch (error) {
       console.error('Error fetching access token:', error);
-      logout(); // Logout if token fetching fails
+      logout(); // Logout if fetching fails
     }
   };
-  
+
   // Refresh the access token using the refresh token endpoint
   const refreshAccessToken = async () => {
     const googleId = localStorage.getItem('googleId');
@@ -129,7 +130,7 @@ const App = (props: AppProps) => {
     const expiresIn = params.get('expiresIn');
     const googleId = params.get('googleId');
     const lastGoogleId = localStorage.getItem('googleId');
-    const loggedOut = localStorage.getItem('loggedOut'); // Check if user is logged out
+    const loggedOut = localStorage.getItem('loggedOut');
   
     console.log('useEffect triggered.');
     console.log('accessToken:', accessToken);
@@ -138,7 +139,7 @@ const App = (props: AppProps) => {
     console.log('lastGoogleId:', lastGoogleId);
     console.log('loggedOut:', loggedOut);
   
-    // Clear loggedOut flag if present
+    // Handle the loggedOut flag and exit if needed
     if (loggedOut === 'true') {
       console.log('User already logged out.');
       localStorage.removeItem('loggedOut');
@@ -146,34 +147,28 @@ const App = (props: AppProps) => {
       return; // Prevent further execution
     }
   
-    // Handle user switch by clearing localStorage if a new Google ID is detected
+    // Detect user switch and clear localStorage if needed
     if (googleId && googleId !== lastGoogleId) {
       console.log('Detected user switch. Clearing localStorage.');
       localStorage.clear();
     }
   
-    // Save tokens if they exist in the query parameters
+    // If query parameters are present, save tokens and clear the URL
     if (accessToken && expiresIn && googleId) {
+      console.log('Saving tokens from query params...');
       saveTokens(accessToken, parseInt(expiresIn), googleId);
       setIsLoggedIn(true);
-      window.history.replaceState({}, document.title, '/'); // Clear query params from the URL
+      window.history.replaceState({}, document.title, '/'); // Clear query params from URL
     } 
-    // If the token is expired or missing, attempt to refresh it
+    // If tokens are not in the query params, attempt to fetch them from cookies
     else if (isTokenExpired()) {
-      const savedGoogleId = localStorage.getItem('googleId');
-      if (savedGoogleId) {
-        console.warn('Token expired or missing. Attempting to refresh...');
-        refreshAccessToken();
-      } else {
-        console.warn('No valid session found. Displaying login prompt.');
-        setIsLoggedIn(false); // Set state to logged out without looping
-      }
+      console.warn('Token expired or missing. Attempting to fetch from server...');
+      fetchAccessToken(); // Invoke fetchAccessToken here
     } else {
       console.log('Tokens are valid. User is logged in.');
       setIsLoggedIn(true);
     }
   }, []);
-
   // useEffect to manage authentication on page load
   /*
   useEffect(() => {
