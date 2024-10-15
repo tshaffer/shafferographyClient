@@ -86,11 +86,13 @@ const App = (props: AppProps) => {
   };
 
   const logout = () => {
+    console.log('Logging out...');
     localStorage.removeItem('googleAccessToken');
     localStorage.removeItem('tokenExpiration');
     localStorage.removeItem('googleId');
-    setIsLoggedIn(false); // Reset the login state
-    window.location.href = '/'; // Redirect to home or login page
+    localStorage.setItem('loggedOut', 'true'); // Set logged out flag
+    setIsLoggedIn(false);
+    window.location.href = '/'; // Redirect to home page
   };
 
   // Main useEffect to handle authentication and token refreshing
@@ -101,13 +103,22 @@ const App = (props: AppProps) => {
     const expiresIn = params.get('expiresIn');
     const googleId = params.get('googleId');
     const lastGoogleId = localStorage.getItem('googleId'); // Previous user ID
-  
-    // Detect user switch and clear storage if different user logs in
+    const loggedOut = localStorage.getItem('loggedOut'); // Check if user is logged out
+
+    console.log('googleId:', googleId);
+
+    // Clear loggedOut flag once the page reloads
+    if (loggedOut === 'true') {
+      console.log('User already logged out.');
+      localStorage.removeItem('loggedOut');
+      return; // Prevent further execution
+    }
+
     if (googleId && googleId !== lastGoogleId) {
       console.log('Detected user switch. Clearing localStorage.');
       localStorage.clear();
     }
-  
+
     if (accessToken && expiresIn && googleId) {
       saveTokens(accessToken, parseInt(expiresIn), googleId);
       setIsLoggedIn(true);
@@ -116,7 +127,7 @@ const App = (props: AppProps) => {
       console.warn('Token expired or missing. Logging out...');
       logout();
     } else {
-      setIsLoggedIn(true);
+      setIsLoggedIn(true); // Tokens are valid, set user as logged in
     }
   }, []);
 
