@@ -97,7 +97,6 @@ const App = (props: AppProps) => {
 
   // Main useEffect to handle authentication and token refreshing
   useEffect(() => {
-    debugger;
     const params = new URLSearchParams(window.location.search);
     const accessToken = params.get('accessToken');
     const expiresIn = params.get('expiresIn');
@@ -105,7 +104,12 @@ const App = (props: AppProps) => {
     const lastGoogleId = localStorage.getItem('googleId'); // Previous user ID
     const loggedOut = localStorage.getItem('loggedOut'); // Check if user is logged out
 
+    console.log('useEffect triggered.');
+    console.log('accessToken:', accessToken);
+    console.log('expiresIn:', expiresIn);
     console.log('googleId:', googleId);
+    console.log('lastGoogleId:', lastGoogleId);
+    console.log('loggedOut:', loggedOut);
 
     // Clear loggedOut flag once the page reloads
     if (loggedOut === 'true') {
