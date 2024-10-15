@@ -49,8 +49,9 @@ const App = (props: AppProps) => {
 
   // Check if the access token is expired
   const isTokenExpired = (): boolean => {
+    const accessToken = localStorage.getItem('googleAccessToken');
     const expiration = localStorage.getItem('tokenExpiration');
-    return !expiration || Date.now() > parseInt(expiration);
+    return !accessToken || !expiration || Date.now() > parseInt(expiration);
   };
 
   // Refresh the access token using the Google ID
@@ -84,12 +85,20 @@ const App = (props: AppProps) => {
     }
   };
 
+  const logout = () => {
+    localStorage.removeItem('googleAccessToken');
+    localStorage.removeItem('tokenExpiration');
+    localStorage.removeItem('googleId');
+    setIsLoggedIn(false); // Reset the login state
+    window.location.href = '/'; // Redirect to home or login page
+  };
+
   // Main useEffect to handle authentication and token refreshing
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const accessToken = params.get('accessToken');
     const expiresIn = params.get('expiresIn');
-    const googleId = params.get('googleId'); // Extract Google ID from query params
+    const googleId = params.get('googleId');
 
     if (accessToken && expiresIn && googleId) {
       // Save tokens on first login
@@ -97,8 +106,9 @@ const App = (props: AppProps) => {
       setIsLoggedIn(true);
       window.history.replaceState({}, document.title, '/'); // Clear query params
     } else if (isTokenExpired()) {
-      // Refresh the token if expired
-      refreshAccessToken();
+      // If token is expired or missing, log the user out
+      console.log('Token expired or missing. Logging out...');
+      logout();
     } else {
       // If tokens are valid, set the user as logged in
       setIsLoggedIn(true);
