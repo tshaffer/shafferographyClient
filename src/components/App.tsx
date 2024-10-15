@@ -180,28 +180,24 @@ const App = (props: AppProps) => {
   }, []);
 
   // Main useEffect to handle authentication and token refreshing
-  // React.useEffect(() => {
-  //   props.onLoadKeywordData()
-  //     .then(function () {
-  //       return props.onLoadTakeouts();
-  //     }).then(function () {
-  //       return props.onLoadLocalStorages();
-  //     }).then(function () {
-  //       return props.onLoadMediaItems();
-  //     }).then(function () {
-  //       return props.onLoadDeletedMediaItems();
-  //     }).then(function () {
-  //       return props.onSetAppInitialized();
-  //     });
-  // }, []);
+  React.useEffect(() => {
+    props.onLoadKeywordData()
+      .then(function () {
+        return props.onLoadTakeouts();
+      }).then(function () {
+        return props.onLoadLocalStorages();
+      }).then(function () {
+        return props.onLoadMediaItems();
+      }).then(function () {
+        return props.onLoadDeletedMediaItems();
+      }).then(function () {
+        return props.onSetAppInitialized();
+      });
+  }, []);
 
   if (!isLoggedIn) {
     return (
       <a href="/auth/google">Login with Google</a>
-    );
-  } else {
-    return (
-      <div>pizza</div>
     );
   }
 

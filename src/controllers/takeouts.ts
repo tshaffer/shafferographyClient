@@ -2,7 +2,7 @@ import axios from 'axios';
 import { TedTaggerAnyPromiseThunkAction, TedTaggerDispatch, addMediaItems, addTakeouts } from '../models';
 import { serverUrl, apiUrlFragment, Takeout, AddedTakeoutData, KeywordData, MediaItem } from '../types';
 import { mergeKeywordData } from './keywords';
-import { isNil } from 'lodash';
+import { isEmpty, isNil, isString } from 'lodash';
 
 export const loadTakeouts = (): TedTaggerAnyPromiseThunkAction => {
   return (dispatch: TedTaggerDispatch, getState: any) => {
@@ -25,9 +25,14 @@ export const loadTakeouts = (): TedTaggerAnyPromiseThunkAction => {
 export const importFromTakeout = (takeoutId: string): TedTaggerAnyPromiseThunkAction => {
   return (dispatch: TedTaggerDispatch, getState: any) => {
 
+    const googleAccessToken: string = localStorage.getItem('googleAccessToken') as string;
+    if (isNil(googleAccessToken) || !isString(googleAccessToken) || isEmpty(googleAccessToken)) {
+      throw new Error('googleAccessToken is invalid');
+    }
+
     const path = serverUrl + apiUrlFragment + 'importFromTakeout';
 
-    const importFromTakeoutBody = { id: takeoutId };
+    const importFromTakeoutBody = { id: takeoutId, googleAccessToken };
 
     return axios.post(
       path,
