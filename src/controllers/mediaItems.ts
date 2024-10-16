@@ -16,7 +16,7 @@ import {
 import {
   serverUrl, apiUrlFragment, ServerMediaItem, MediaItem, TedTaggerState, MatchRule, SearchRule,
 } from '../types';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isEmpty, isNil, isString } from 'lodash';
 import {
   getMatchRule,
   getMediaItemById,
@@ -250,9 +250,14 @@ export const redownloadMediaItem = (mediaItemId: string): any => {
 
   return (dispatch: TedTaggerDispatch) => {
 
+    const googleAccessToken: string = localStorage.getItem('googleAccessToken') as string;
+    if (isNil(googleAccessToken) || !isString(googleAccessToken) || isEmpty(googleAccessToken)) {
+      throw new Error('googleAccessToken is invalid');
+    }
+
     const path = serverUrl + apiUrlFragment + 'redownloadMediaItem';
 
-    const redownloadMediaItemBody = { id: mediaItemId };
+    const redownloadMediaItemBody = { id: mediaItemId, googleAccessToken };
 
     return axios.post(
       path,
