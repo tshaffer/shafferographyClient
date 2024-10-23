@@ -266,7 +266,7 @@ const App = (props: AppProps) => {
 
     // Append all files in the folder to the FormData object
     Array.from(selectedFiles).forEach((file) => {
-      formData.append('files[]', file, file.webkitRelativePath);
+      formData.append('files', file, file.webkitRelativePath);
     });
 
     try {
@@ -314,6 +314,7 @@ const App = (props: AppProps) => {
             type="file"
             webkitdirectory=""
             id="folderInput"
+            name="file" 
             multiple
             onChange={handleFolderSelect}
             ref={folderInputRef}
