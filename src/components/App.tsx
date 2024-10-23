@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
@@ -17,6 +17,14 @@ import SurveyView from './SurveyView';
 import TopToolbar from './TopToolbar';
 import GridView from './GridView';
 import ImportFromLocalStorageDialog from './ImportFromLocalStorageDialog';
+import { uploadRawMedia } from '../controllers/rawMediaUploader';
+
+declare module 'react' {
+  interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
+    webkitdirectory?: string;
+  }
+}
+
 
 export interface AppProps {
   photoLayout: PhotoLayout;
@@ -40,9 +48,15 @@ const App = (props: AppProps) => {
   const [showImportFromTakeoutDialog, setShowImportFromTakeoutDialog] = React.useState(false);
   const [showImportFromLocalStorageDialog, setShowImportFromLocalStorageDialog] = React.useState(false);
 
+  const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const folderInputRef = useRef<HTMLInputElement | null>(null);
+
   // Save the access token, expiration, and Google ID in localStorage
   const saveTokens = (token: string, expiresIn: number, googleId: string) => {
-    debugger;
     const expirationTime = Date.now() + expiresIn * 1000; // Convert to milliseconds
     localStorage.setItem('googleAccessToken', token);
     localStorage.setItem('tokenExpiration', expirationTime.toString());
@@ -67,19 +81,19 @@ const App = (props: AppProps) => {
         method: 'GET',
         credentials: 'include', // Include HTTP-only cookies
       });
-  
+
       if (response.ok) {
         const data = await response.json();
         const { accessToken, googleId } = data;
-  
+
         console.log('Access token fetched:', accessToken);
         console.log('Google ID fetched:', googleId);
-  
+
         const expiresIn = 3600; // 1 hour validity
-  
+
         // Save the token and Google ID to localStorage
         saveTokens(accessToken, expiresIn, googleId);
-  
+
         setAccessToken(accessToken);
         setIsLoggedIn(true);
       } else {
@@ -132,6 +146,13 @@ const App = (props: AppProps) => {
     setIsLoggedIn(false); // Set state to logged out
     window.location.href = '/'; // Redirect to the home or login page
   };
+
+  // Set the `webkitdirectory` attribute using ref after the component is mounted
+  React.useEffect(() => {
+    if (folderInputRef.current) {
+      folderInputRef.current.setAttribute('webkitdirectory', '');
+    }
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -221,7 +242,53 @@ const App = (props: AppProps) => {
     setShowImportFromLocalStorageDialog(false);
   };
 
+  // Handle folder selection
+  const handleFolderSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setSelectedFiles(event.target.files);
+      setError(null); // Reset error message when new folder is selected
+      setSuccessMessage(null); // Reset success message
+    }
+  };
+
+  // Handle upload on button press
+  const handleUpload = async () => {
+    if (!selectedFiles) {
+      setError('Please select a folder first');
+      return;
+    }
+
+    setUploading(true);
+    setError(null);
+    setSuccessMessage(null);
+
+    const formData = new FormData();
+
+    // Append all files in the folder to the FormData object
+    Array.from(selectedFiles).forEach((file) => {
+      formData.append('files[]', file, file.webkitRelativePath);
+    });
+
+    try {
+      const response = await uploadRawMedia(formData);
+
+      if (response.ok) {
+        setSuccessMessage('Folder uploaded successfully!');
+      } else {
+        const errorMessage = await response.text();
+        setError(`Upload failed: ${errorMessage}`);
+      }
+    } catch (err) {
+      setError(`Upload failed: ${err}`);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const getLeftColumn = (): JSX.Element => {
+
+    console.log('folderInputRef', folderInputRef);
+
     return (
       <div className='leftColumnStyle'>
         <Keywords />
@@ -242,6 +309,22 @@ const App = (props: AppProps) => {
           onImportFromLocalStorage={handleImportFromLocalStorage}
           onClose={handleCloseImportFromLocalStorageDialog}
         />
+        <div>
+          <input
+            type="file"
+            webkitdirectory=""
+            id="folderInput"
+            multiple
+            onChange={handleFolderSelect}
+            ref={folderInputRef}
+            style={{ marginBottom: '1rem' }}
+          />
+          <button onClick={handleUpload} disabled={uploading}>
+            {uploading ? 'Uploading...' : 'Upload Folder'}
+          </button>
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+          {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
+        </div>
       </div>
     );
   };
@@ -275,6 +358,98 @@ const App = (props: AppProps) => {
       );
     }
   };
+
+  /*
+import React, { useState, useRef, useEffect } from 'react';
+
+interface UploadFolderProps {
+  uploadUrl: string; // URL to your server endpoint that handles folder uploads
+}
+
+const UploadFolder: React.FC<UploadFolderProps> = ({ uploadUrl }) => {
+  const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const folderInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Handle folder selection
+  const handleFolderSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setSelectedFiles(event.target.files);
+      setError(null); // Reset error message when new folder is selected
+      setSuccessMessage(null); // Reset success message
+    }
+  };
+
+  // Handle upload on button press
+  const handleUpload = async () => {
+    if (!selectedFiles) {
+      setError('Please select a folder first');
+      return;
+    }
+
+    setUploading(true);
+    setError(null);
+    setSuccessMessage(null);
+
+    const formData = new FormData();
+
+    // Append all files in the folder to the FormData object
+    Array.from(selectedFiles).forEach((file) => {
+      formData.append('files[]', file, file.webkitRelativePath);
+    });
+
+    try {
+      const response = await fetch(uploadUrl, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        setSuccessMessage('Folder uploaded successfully!');
+      } else {
+        const errorMessage = await response.text();
+        setError(`Upload failed: ${errorMessage}`);
+      }
+    } catch (err) {
+      setError(`Upload failed: ${err}`);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // Set the `webkitdirectory` attribute using ref after the component is mounted
+  useEffect(() => {
+    if (folderInputRef.current) {
+      folderInputRef.current.setAttribute('webkitdirectory', '');
+    }
+  }, []);
+
+  return (
+    <div>
+      <input
+        type="file"
+        id="folderInput"
+        multiple
+        onChange={handleFolderSelect}
+        ref={folderInputRef}
+        style={{ marginBottom: '1rem' }}
+      />
+      <button onClick={handleUpload} disabled={uploading}>
+        {uploading ? 'Uploading...' : 'Upload Folder'}
+      </button>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
+    </div>
+  );
+};
+
+export default UploadFolder;
+
+*/
+
 
   const photoDisplay: JSX.Element = getPhotoDisplay();
 
