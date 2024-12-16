@@ -304,6 +304,32 @@ const App = (props: AppProps) => {
 
     console.log('selectedFiles', selectedFiles);
 
+    setImporting(true);
+    setError(null);
+    setSuccessMessage(null);
+
+    const formData = new FormData();
+
+    // Append all files in the folder to the FormData object
+    Array.from(selectedFiles).forEach((file) => {
+      formData.append('files', file, file.name);
+    });
+
+    try {
+      const response = await uploadRawMedia(formData);
+
+      if (response.ok) {
+        setSuccessMessage('Import completed successfully!');
+      } else {
+        const errorMessage = await response.text();
+        setError(`Import failed: ${errorMessage}`);
+      }
+    } catch (err) {
+      setError(`Import failed: ${err}`);
+    } finally {
+      setImporting(false);
+    }
+
     return;
   };
 
