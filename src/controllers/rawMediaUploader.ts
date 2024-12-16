@@ -5,7 +5,8 @@ export const uploadRawMedia = async (formData: FormData): Promise<any> => {
 
   const albumName = 'testAlbum';
   
-  const uploadUrl = serverUrl + apiUrlFragment + 'uploadRawMedia';
+  // const uploadUrl = serverUrl + apiUrlFragment + 'uploadRawMedia';
+  const uploadUrl = serverUrl + apiUrlFragment + 'uploadAndImport';
 
   try {
     // Append additional information
