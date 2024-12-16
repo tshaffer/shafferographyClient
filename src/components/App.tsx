@@ -303,6 +303,11 @@ const App = (props: AppProps) => {
           onImportFromTakeout={handleImportFromTakeout}
           onClose={handleCloseImportFromTakeoutDialog}
         />
+      </div>
+    );
+  };
+
+  /* code for old import functions
         <Button onClick={() => setShowImportFromLocalStorageDialog(true)}>Import from Local Storage</Button>
         <ImportFromLocalStorageDialog
           open={showImportFromLocalStorageDialog}
@@ -326,10 +331,7 @@ const App = (props: AppProps) => {
           {error && <p style={{ color: 'red' }}>{error}</p>}
           {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
         </div>
-      </div>
-    );
-  };
-
+  */
   const getPhotoDisplay = (): JSX.Element => {
     if (props.photoLayout === PhotoLayout.Loupe) {
       return (
