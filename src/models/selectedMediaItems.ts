@@ -16,31 +16,31 @@ export const SET_LAST_CLICKED_ID = 'SET_LAST_CLICKED_ID';
 // ------------------------------------
 
 interface SelectMediaItemPayload {
-  googleId: string;
+  googleMediaItemid: string;
 }
 
 export const selectMediaItem = (
-  googleId: string,
+  googleMediaItemid: string,
 ): any => {
   return {
     type: SELECT_MEDIA_ITEM,
     payload: {
-      googleId
+      googleMediaItemid
     }
   };
 };
 
 interface DeselectMediaItemPayload {
-  googleId: string;
+  googleMediaItemid: string;
 }
 
 export const deselectMediaItem = (
-  googleId: string,
+  googleMediaItemid: string,
 ): any => {
   return {
     type: DESELECT_MEDIA_ITEM,
     payload: {
-      googleId
+      googleMediaItemid
     }
   };
 };
@@ -53,16 +53,16 @@ export const clearMediaItemSelection = (
 };
 
 interface SetLastClickedIdPayload {
-  googleId: string | null;
+  googleMediaItemid: string | null;
 }
 
 export const setLastClickedId = (
-  googleId: string | null,
+  googleMediaItemid: string | null,
 ): any => {
   return {
     type: SET_LAST_CLICKED_ID,
     payload: {
-      googleId
+      googleMediaItemid
     }
   };
 };
@@ -92,17 +92,17 @@ export const selectedMediaItemsStateReducer = (
     }
     case SET_LAST_CLICKED_ID: {
       const newState = cloneDeep(state) as SelectedMediaItemsState;
-      newState.lastClickedId = action.payload.googleId;
+      newState.lastClickedId = action.payload.googleMediaItemid;
       return newState;
     }
     case SELECT_MEDIA_ITEM: {
       const newState = cloneDeep(state) as SelectedMediaItemsState;
-      newState.selectedMediaItemIds.push(action.payload.googleId);
+      newState.selectedMediaItemIds.push(action.payload.googleMediaItemid);
       return newState;
     }
     case DESELECT_MEDIA_ITEM: {
       const newState = cloneDeep(state) as SelectedMediaItemsState;
-      newState.selectedMediaItemIds = newState.selectedMediaItemIds.filter((selectedId) => selectedId !== action.payload.googleId);
+      newState.selectedMediaItemIds = newState.selectedMediaItemIds.filter((selectedId) => selectedId !== action.payload.googleMediaItemid);
       return newState;
     }
     default:

@@ -124,7 +124,7 @@ export const addKeywordToMediaItems = (
     // const path = serverUrl + apiUrlFragment + 'addKeywordToMediaItems';
 
     // const googleMediaItemIds: string[] = mediaItems.map((mediaItem: MediaItem) => {
-    //   return mediaItem.googleId;
+    //   return mediaItem.googleMediaItemId;
     // });
 
     dispatch(addKeywordToMediaItemIdsRedux(mediaItemIds, keywordNodeId));
@@ -139,7 +139,7 @@ export const addKeywordToMediaItems = (
     //   updateKeywordsInMediaItemsBody
     // ).then((response) => {
     //   dispatch(addTagToMediaItemsRedux(mediaItems, keywordNode.id));
-    //   // return mediaItems.googleId;
+    //   // return mediaItems.googleMediaItemId;
     // }).catch((error) => {
     //   console.log('error');
     //   console.log(error);

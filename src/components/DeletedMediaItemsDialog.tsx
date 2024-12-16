@@ -35,9 +35,9 @@ const DeletedMediaItemsDialog = (props: DeletedMediaItemsDialogProps) => {
     onClose();
   };
 
-  const handleRemoveDeletedMediaItem = (googleId: string) => {
-    console.log('handleRemoveDeletedMediaItem: ', googleId);
-    onRemoveDeletedMediaItem(googleId);
+  const handleRemoveDeletedMediaItem = (googleMediaItemId: string) => {
+    console.log('handleRemoveDeletedMediaItem: ', googleMediaItemId);
+    onRemoveDeletedMediaItem(googleMediaItemId);
   };
 
   const deletedMediaItems = cloneDeep(props.deletedMediaItems);

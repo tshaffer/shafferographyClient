@@ -42,7 +42,7 @@ function mapStateToProps(state: any, ownProps: any) {
   return {
     mediaItem: ownProps.mediaItem,
     surveyModeZoomFactor: getSurveyModeZoomFactor(state),
-    mediaItemZoomFactor: getMediaItemZoomFactor(state, ownProps.mediaItem.googleId),
+    mediaItemZoomFactor: getMediaItemZoomFactor(state, ownProps.mediaItem.googleMediaItemId),
   };
 }
 

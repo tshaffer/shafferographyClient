@@ -11,10 +11,10 @@ export const getMediaItemIds = (state: TedTaggerState): string[] => {
   return state.mediaItemsState.mediaItems.map((mediaItem: MediaItem) => mediaItem.googleMediaItemId);
 };
 
-export const getMediaItemById = (state: TedTaggerState, googleId: string): MediaItem | null => {
+export const getMediaItemById = (state: TedTaggerState, googleMediaItemId: string): MediaItem | null => {
 
   for (const mediaItem of state.mediaItemsState.mediaItems) {
-    if (mediaItem.googleMediaItemId === googleId) {
+    if (mediaItem.googleMediaItemId === googleMediaItemId) {
       return mediaItem;
     }
   }

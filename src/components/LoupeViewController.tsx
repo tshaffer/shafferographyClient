@@ -47,7 +47,6 @@ const LoupeViewController = (props: LoupeViewControllerProps) => {
         debugger;
       }
 
-      // const mediaItemIndex = props.mediaItems.findIndex((mediaItem: MediaItem) => mediaItem.googleId === loupeViewMediaItemId);
       const previousMediaItemIndex = loupeViewMediaItemIndex - 1;
       if (previousMediaItemIndex < 0) {
         return;
@@ -71,7 +70,6 @@ const LoupeViewController = (props: LoupeViewControllerProps) => {
         debugger;
       }
 
-      // const mediaItemIndex = props.mediaItems.findIndex((mediaItem: MediaItem) => mediaItem.googleId === loupeViewMediaItemId);
       const nextMediaItemIndex = loupeViewMediaItemIndex + 1;
       if (nextMediaItemIndex >= props.loupeViewMediaItemIds.length) {
         console.log('at end');
