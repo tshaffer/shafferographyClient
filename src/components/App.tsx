@@ -49,7 +49,7 @@ const App = (props: AppProps) => {
   const [showImportFromLocalStorageDialog, setShowImportFromLocalStorageDialog] = React.useState(false);
 
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
-  const [uploading, setUploading] = useState(false);
+  const [importing, setImporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -238,51 +238,95 @@ const App = (props: AppProps) => {
     setShowImportFromTakeoutDialog(false);
   };
 
-  const handleCloseImportFromLocalStorageDialog = () => {
-    setShowImportFromLocalStorageDialog(false);
-  };
+  // const handleCloseImportFromLocalStorageDialog = () => {
+  //   setShowImportFromLocalStorageDialog(false);
+  // };
 
   // Handle folder selection
-  const handleFolderSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // const handleFolderSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   if (event.target.files) {
+  //     setSelectedFiles(event.target.files);
+  //     setError(null); // Reset error message when new folder is selected
+  //     setSuccessMessage(null); // Reset success message
+  //   }
+  // };
+
+  // Handle upload on button press
+  // const handleUpload = async () => {
+  //   if (!selectedFiles) {
+  //     setError('Please select a folder first');
+  //     return;
+  //   }
+
+  //   setUploading(true);
+  //   setError(null);
+  //   setSuccessMessage(null);
+
+  //   const formData = new FormData();
+
+  //   // Append all files in the folder to the FormData object
+  //   Array.from(selectedFiles).forEach((file) => {
+  //     formData.append('files', file, file.webkitRelativePath);
+  //   });
+
+  //   try {
+  //     const response = await uploadRawMedia(formData);
+
+  //     if (response.ok) {
+  //       setSuccessMessage('Folder uploaded successfully!');
+  //     } else {
+  //       const errorMessage = await response.text();
+  //       setError(`Upload failed: ${errorMessage}`);
+  //     }
+  //   } catch (err) {
+  //     setError(`Upload failed: ${err}`);
+  //   } finally {
+  //     setUploading(false);
+  //   }
+  // };
+
+  const handleImportFilesSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
+      const files = Array.from(event.target.files);
+      console.log('Selected files:', files);
       setSelectedFiles(event.target.files);
       setError(null); // Reset error message when new folder is selected
       setSuccessMessage(null); // Reset success message
     }
   };
 
-  // Handle upload on button press
-  const handleUpload = async () => {
+  const handleImport = async () => {
+    console.log('handleImport');
     if (!selectedFiles) {
-      setError('Please select a folder first');
+      setError('Please select file(s) first');
       return;
     }
 
-    setUploading(true);
-    setError(null);
-    setSuccessMessage(null);
+    console.log('selectedFiles', selectedFiles);
 
-    const formData = new FormData();
+    return;
+  };
 
-    // Append all files in the folder to the FormData object
-    Array.from(selectedFiles).forEach((file) => {
-      formData.append('files', file, file.webkitRelativePath);
-    });
-
-    try {
-      const response = await uploadRawMedia(formData);
-
-      if (response.ok) {
-        setSuccessMessage('Folder uploaded successfully!');
-      } else {
-        const errorMessage = await response.text();
-        setError(`Upload failed: ${errorMessage}`);
-      }
-    } catch (err) {
-      setError(`Upload failed: ${err}`);
-    } finally {
-      setUploading(false);
-    }
+  const renderImport = (): JSX.Element => {
+    console.log('renderImport');
+    return (
+      <div>
+        <input
+          type="file"
+          accept=".jpg,.heic,image/jpeg,image/heic"
+          onChange={handleImportFilesSelect}
+          id="importFilesInput"
+          name="file"
+          multiple
+          style={{ marginBottom: '1rem' }}
+        />
+        <button onClick={handleImport} disabled={importing}>
+          {importing ? 'Importing...' : 'Import Files'}
+        </button>
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
+      </div>
+    );
   };
 
   const getLeftColumn = (): JSX.Element => {
@@ -303,6 +347,7 @@ const App = (props: AppProps) => {
           onImportFromTakeout={handleImportFromTakeout}
           onClose={handleCloseImportFromTakeoutDialog}
         />
+        {renderImport()}
       </div>
     );
   };
