@@ -42,11 +42,11 @@ function SurveyViewImageContainer(props: SurveyViewImageContainerProps) {
   const [openDialog, setOpenDialog] = React.useState(false);
 
   const handleSurveyViewImageZoomIn = () => {
-    props.onSetMediaItemZoomFactor(props.mediaItem.googleId, props.mediaItemZoomFactor + 0.2);
+    props.onSetMediaItemZoomFactor(props.mediaItem.googleMediaItemId, props.mediaItemZoomFactor + 0.2);
   };
 
   const handleSurveyViewImageZoomOut = () => {
-    props.onSetMediaItemZoomFactor(props.mediaItem.googleId, props.mediaItemZoomFactor - 0.2);
+    props.onSetMediaItemZoomFactor(props.mediaItem.googleMediaItemId, props.mediaItemZoomFactor - 0.2);
   };
 
   const handleCloseDialog = () => {
@@ -59,7 +59,7 @@ function SurveyViewImageContainer(props: SurveyViewImageContainerProps) {
 
   const handleConfirmDelete = () => {
     setOpenDialog(false);
-    props.onDeleteSurveyViewImageContainerItem(props.mediaItem.googleId);
+    props.onDeleteSurveyViewImageContainerItem(props.mediaItem.googleMediaItemId);
   };
 
   const photoUrl = getPhotoUrl(props.mediaItem);
@@ -79,7 +79,7 @@ function SurveyViewImageContainer(props: SurveyViewImageContainerProps) {
         />
       </div>
       <CardMedia
-        id={props.mediaItem.googleId}
+        id={props.mediaItem.googleMediaItemId}
         className='survey-image-container'
         title={photoUrl}
         sx={cardMediaStyle}

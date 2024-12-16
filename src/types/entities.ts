@@ -12,7 +12,8 @@ export interface ServerPerson {
 }
 
 export interface ServerMediaItem {
-  googleId: string,
+  uniqueId: string;
+  googleMediaItemId: string,
   fileName: string,
   albumId: string;
   filePath?: string,
@@ -30,7 +31,8 @@ export interface ServerMediaItem {
 }
 
 export interface MediaItem {
-  googleId: string,
+  uniqueId: string;
+  googleMediaItemId: string,
   fileName: string,
   albumId: string;
   filePath?: string,

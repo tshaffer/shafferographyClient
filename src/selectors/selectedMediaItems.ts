@@ -26,7 +26,7 @@ export const isMediaItemSelected = (state: TedTaggerState, mediaItem: MediaItem)
   const selectedMediaItemIds: string[] = getSelectedMediaItemIds(state);
   for (const selectedMediaItemId of selectedMediaItemIds) {
     const selectedMediaItem = getMediaItemById(state, selectedMediaItemId);
-    if (selectedMediaItem?.googleId === mediaItem?.googleId) {
+    if (selectedMediaItem?.googleMediaItemId === mediaItem?.googleMediaItemId) {
       return true;
     }
   }

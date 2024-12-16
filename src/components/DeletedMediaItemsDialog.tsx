@@ -66,10 +66,10 @@ const DeletedMediaItemsDialog = (props: DeletedMediaItemsDialogProps) => {
                 const labelId = `checkbox-list-label-${mediaItem.fileName}`;
                 return (
                   <ListItem
-                    key={mediaItem.googleId}
+                    key={mediaItem.googleMediaItemId}
                   // disablePadding
                   >
-                    <ListItemButton role={undefined} onClick={() => { handleRemoveDeletedMediaItem(mediaItem.googleId); }} dense>
+                    <ListItemButton role={undefined} onClick={() => { handleRemoveDeletedMediaItem(mediaItem.googleMediaItemId); }} dense>
                       <ListItemIcon>
                         <RemoveCircleIcon />
                       </ListItemIcon>

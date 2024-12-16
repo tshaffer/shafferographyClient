@@ -30,7 +30,7 @@ export const selectPhoto = (id: string, commandKey: boolean, shiftKey: boolean) 
     const mediaItems: MediaItem[] = getMediaItems(getState());
     const selectedMediaItemIds: string[] = getSelectedMediaItemIds(getState());
 
-    const index = mediaItems.findIndex((mediaItem) => mediaItem.googleId === id);
+    const index = mediaItems.findIndex((mediaItem) => mediaItem.googleMediaItemId === id);
 
     if (index === -1) {
       console.error('Item with id not found:', id);
@@ -65,20 +65,20 @@ const handleShiftClick = (index: number, mediaItems: MediaItem[], selectedMediaI
     const lastClickedId = getLastClickedId(getState());
     if (lastClickedId !== null) {
       const start = Math.min(
-        mediaItems.findIndex((item) => item.googleId === lastClickedId), index);
+        mediaItems.findIndex((item) => item.googleMediaItemId === lastClickedId), index);
       const end = Math.max(
-        mediaItems.findIndex((item) => item.googleId === lastClickedId),
+        mediaItems.findIndex((item) => item.googleMediaItemId === lastClickedId),
         index
       );
 
       for (let i = start; i <= end; i++) {
-        const id = mediaItems[i].googleId;
+        const id = mediaItems[i].googleMediaItemId;
         if (!selectedMediaItemIds.includes(id)) {
           dispatch(selectMediaItem(id));
         }
       }
     } else {
-      dispatch(handleToggleSelection(mediaItems[index].googleId, selectedMediaItemIds));
+      dispatch(handleToggleSelection(mediaItems[index].googleMediaItemId, selectedMediaItemIds));
     }
   };
 };

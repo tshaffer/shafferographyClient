@@ -33,7 +33,7 @@ const SurveyView = (props: SurveyViewProps) => {
   ): JSX.Element => {
     return (
       <SurveyViewGridItem
-        key={mediaItem.googleId}
+        key={mediaItem.googleMediaItemId}
         mediaItem={mediaItem}
         numGridRows={numGridRows}
         numGridColumns={numGridColumns}

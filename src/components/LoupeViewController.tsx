@@ -53,11 +53,11 @@ const LoupeViewController = (props: LoupeViewControllerProps) => {
         return;
       } else {
         const previousMediaItemId: string = props.loupeViewMediaItemIds[previousMediaItemIndex];
-        const previousMediaItem = props.mediaItems.find((mediaItem: MediaItem) => mediaItem.googleId === previousMediaItemId);
-        props.onSetLoupeViewMediaItemId(previousMediaItem!.googleId);
+        const previousMediaItem = props.mediaItems.find((mediaItem: MediaItem) => mediaItem.googleMediaItemId === previousMediaItemId);
+        props.onSetLoupeViewMediaItemId(previousMediaItem!.googleMediaItemId);
         if (props.selectedMediaItemIds.length === 1) {
           props.onDeselectAllPhotos(); // only perform the deselect if there's only a single selected item.
-          props.onSelectPhoto(previousMediaItem!.googleId, false, false);
+          props.onSelectPhoto(previousMediaItem!.googleMediaItemId, false, false);
         }
       }
     };
@@ -78,12 +78,12 @@ const LoupeViewController = (props: LoupeViewControllerProps) => {
         return;
       } else {
         const nextMediaItemId: string = props.loupeViewMediaItemIds[nextMediaItemIndex];
-        const nextMediaItem = props.mediaItems.find((mediaItem: MediaItem) => mediaItem.googleId === nextMediaItemId);
+        const nextMediaItem = props.mediaItems.find((mediaItem: MediaItem) => mediaItem.googleMediaItemId === nextMediaItemId);
         console.log('nextMediaItem: ' + nextMediaItem);
-        props.onSetLoupeViewMediaItemId(nextMediaItem!.googleId);
+        props.onSetLoupeViewMediaItemId(nextMediaItem!.googleMediaItemId);
         if (props.selectedMediaItemIds.length === 1) {
           props.onDeselectAllPhotos(); // only perform the deselect if there's only a single selected item.
-          props.onSelectPhoto(nextMediaItem!.googleId, false, false);
+          props.onSelectPhoto(nextMediaItem!.googleMediaItemId, false, false);
         }
       }
     };

@@ -239,7 +239,7 @@ export const mediaItemsStateReducer = (
     }
     case REMOVE_DELETED_MEDIA_ITEM: {
       let updatedDeletedMediaItems = cloneDeep(state.deletedMediaItems);
-      updatedDeletedMediaItems = updatedDeletedMediaItems.filter(item => item.googleId !== action.payload.mediaItemId);
+      updatedDeletedMediaItems = updatedDeletedMediaItems.filter(item => item.googleMediaItemId !== action.payload.mediaItemId);
       return {
         ...state,
         deletedMediaItems: updatedDeletedMediaItems,
@@ -247,7 +247,7 @@ export const mediaItemsStateReducer = (
     }
     case DELETE_MEDIA_ITEMS: {
       let updatedMediaItems = cloneDeep(state.mediaItems);
-      updatedMediaItems = updatedMediaItems.filter(item => !(action.payload.mediaItemIds.includes(item.googleId)));
+      updatedMediaItems = updatedMediaItems.filter(item => !(action.payload.mediaItemIds.includes(item.googleMediaItemId)));
       return {
         ...state,
         mediaItems: updatedMediaItems,
@@ -263,7 +263,7 @@ export const mediaItemsStateReducer = (
       newState.mediaItems.forEach((mediaItem) => {
 
         // is the current media item in the list of selected media items?
-        const matchingInputItem = action.payload.mediaItemIds.find((inputItemId) => inputItemId === mediaItem.googleId);
+        const matchingInputItem = action.payload.mediaItemIds.find((inputItemId) => inputItemId === mediaItem.googleMediaItemId);
         if (matchingInputItem) {
           // if yes, add the keyword to the media item's list of assigned keywords (if it doesn't already exist)
           if (isNil(mediaItem.keywordNodeIds)) {
@@ -283,7 +283,7 @@ export const mediaItemsStateReducer = (
     case REMOVE_KEYWORD_FROM_MEDIA_ITEM_IDS: {
       const newState = cloneDeep(state) as MediaItemsState;
       newState.mediaItems.forEach((mediaItem) => {
-        const matchingInputItem = action.payload.mediaItemIds.find((inputItemId) => inputItemId === mediaItem.googleId);
+        const matchingInputItem = action.payload.mediaItemIds.find((inputItemId) => inputItemId === mediaItem.googleMediaItemId);
         if (matchingInputItem) {
           if (!isNil(mediaItem.keywordNodeIds)) {
             const keywordNodeIndex = mediaItem.keywordNodeIds.indexOf(action.payload.keywordNodeId);
@@ -298,7 +298,7 @@ export const mediaItemsStateReducer = (
     case ADD_KEYWORD_TO_MEDIA_ITEMS: {
       const newState = cloneDeep(state) as MediaItemsState;
       newState.mediaItems.forEach((item) => {
-        const matchingInputItem = action.payload.mediaItems.find((inputItem) => inputItem.googleId === item.googleId);
+        const matchingInputItem = action.payload.mediaItems.find((inputItem) => inputItem.googleMediaItemId === item.googleMediaItemId);
         if (matchingInputItem) {
           const keywordNodeIndex = item.keywordNodeIds.indexOf(action.payload.keywordNodeId);
           if (keywordNodeIndex === -1) {

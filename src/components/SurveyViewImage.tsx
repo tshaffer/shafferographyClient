@@ -21,7 +21,7 @@ function SurveyViewImage(props: SurveyViewImageProps) {
 
   const photoUrl = getPhotoUrl(props.mediaItem);
 
-  const elementId: string = 'surveyImage' + props.mediaItem.googleId;
+  const elementId: string = 'surveyImage' + props.mediaItem.googleMediaItemId;
   const imageElement = document.getElementById(elementId) as HTMLImageElement | null;
   const zoomFactor = props.surveyModeZoomFactor * props.mediaItemZoomFactor;
   if (imageElement) {
