@@ -5,20 +5,21 @@ import { connect } from 'react-redux';
 import '../styles/TedTagger.css';
 import { loadMediaItems, loadKeywordData, loadTakeouts, importFromTakeout, loadDeletedMediaItems, loadLocalStorageFolders, importFromLocalStorage } from '../controllers';
 import { TedTaggerDispatch, setAppInitialized } from '../models';
-import { getKeywordRootNodeId, getPhotoLayout } from '../selectors';
+import { getKeywordRootNodeId, getPhotoLayout, getSelectedMediaItems } from '../selectors';
 import { Button } from '@mui/material';
 
 import Keywords from './Keywords';
 import SearchSpecDialog from './SearchSpecDialog';
 import ImportFromTakeoutDialog from './ImportFromTakeoutDialog';
 import LoupeViewController from './LoupeViewController';
-import { PhotoLayout } from '../types';
+import { MediaItem, PhotoLayout } from '../types';
 import SurveyView from './SurveyView';
 import TopToolbar from './TopToolbar';
 import GridView from './GridView';
 import ImportFromLocalStorageDialog from './ImportFromLocalStorageDialog';
 import { uploadRawMedia } from '../controllers/rawMediaUploader';
 import UploadToGoogleDialog from './UploadToGoogleDialog';
+import { uploadToGoogle } from '../controllers/googleUploader';
 
 declare module 'react' {
   interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -26,9 +27,9 @@ declare module 'react' {
   }
 }
 
-
 export interface AppProps {
   photoLayout: PhotoLayout;
+  selectedMediaItems: MediaItem[],
   onLoadKeywordData: () => any;
   onLoadMediaItems: () => any;
   onLoadDeletedMediaItems: () => any;
@@ -39,7 +40,6 @@ export interface AppProps {
   onImportFromTakeout: (id: string) => void;
   onImportFromLocalStorage: (folder: string) => void;
 }
-
 
 const App = (props: AppProps) => {
 
@@ -52,6 +52,7 @@ const App = (props: AppProps) => {
 
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [importing, setImporting] = useState(false);
+  const [uploadingToGoogle, setUploadingToGoogle] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -232,10 +233,6 @@ const App = (props: AppProps) => {
     props.onImportFromLocalStorage(takeoutId);
   };
 
-  const handleUploadToGoogleDialog = (albumName: string) => {
-    console.log('handleUploadToGoogleDialog', albumName);
-  };
-
   const handleCloseSearchSpecDialog = () => {
     setShowSearchSpecDialog(false);
   };
@@ -336,7 +333,32 @@ const App = (props: AppProps) => {
       setImporting(false);
     }
 
-    return;
+  };
+
+  const handleUploadToGoogle = async (albumName: string) => {
+    console.log('handleUploadToGoogle', albumName);
+
+    setUploadingToGoogle(true);
+    setError(null);
+    setSuccessMessage(null);
+
+    const mediaItemIds: string[] = props.selectedMediaItems.map((mediaItem) => mediaItem.uniqueId);
+
+    try {
+      const response = await uploadToGoogle(albumName, mediaItemIds);
+
+      if (response.ok) {
+        setSuccessMessage('Upload to google completed successfully!');
+      } else {
+        const errorMessage = await response.text();
+        setError(`Upload to google failed: ${errorMessage}`);
+      }
+    } catch (err) {
+      setError(`Upload to google failed: ${err}`);
+    } finally {
+      setUploadingToGoogle(false);
+    }
+
   };
 
   const renderImport = (): JSX.Element => {
@@ -380,7 +402,7 @@ const App = (props: AppProps) => {
         <Button onClick={() => setShowUploadToGoogleDialog(true)}>Upload to Google</Button>
         <UploadToGoogleDialog
           open={showUploadToGoogleDialog}
-          onUploadToGoogle={handleUploadToGoogleDialog}
+          onUploadToGoogle={handleUploadToGoogle}
           onClose={handleCloseUploadToGoogleDialogDialog}
         />
       </div>
@@ -461,6 +483,7 @@ function mapStateToProps(state: any) {
   return {
     photoLayout: getPhotoLayout(state),
     keywordRootNodeId: getKeywordRootNodeId(state),
+    selectedMediaItems: getSelectedMediaItems(state),
   };
 }
 

@@ -66,7 +66,7 @@ const UploadToGoogleDialog = (props: UploadToGoogleDialogProps) => {
       >
         <Button onClick={handleClose}>Cancel</Button>
         <Button onClick={handleUploadToGoogle} autoFocus>
-          Add
+          Upload
         </Button>
       </DialogActions>
 
