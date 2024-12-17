@@ -2,6 +2,12 @@ import * as React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
+// import * as heif from 'libheif-js'; // HEIC decoding library
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+// const libheif = require('libheif-js');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const libheif = require('libheif-js/wasm-bundle');
+
 import { TedTaggerDispatch, setLoupeViewMediaItemIdRedux, setPhotoLayoutRedux } from '../models';
 
 import '../styles/TedTagger.css';
@@ -31,9 +37,69 @@ export interface GridCellProps extends GridCellPropsFromParent {
 
 const GridCell = (props: GridCellProps) => {
 
+  const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
+  const imgRef = React.useRef<HTMLImageElement | null>(null);
+
+  const { fileName } = props.mediaItem;
+  const isHeic = fileName.toLowerCase().endsWith('.heic');
+
   const [clickTimeout, setClickTimeout] = React.useState<NodeJS.Timeout | null>(null);
 
   const mediaItem: MediaItem = props.mediaItem;
+
+  const photoUrl = getPhotoUrl(mediaItem);
+
+  React.useEffect(() => {
+    const renderHeicImage = async () => {
+      if (isHeic && canvasRef.current) {
+        try {
+
+          debugger;
+          // Fetch the HEIC file from the server as ArrayBuffer
+          const response = await fetch(photoUrl);
+          if (!response.ok) throw new Error('Failed to fetch HEIC file');
+
+          const arrayBuffer = await response.arrayBuffer();
+
+          // Decode the HEIC image using libheif-js
+          const heifDecoder = new libheif.HeifDecoder();
+          const heifImage = heifDecoder.decode(arrayBuffer);
+
+          const image = heifImage[0];
+          const width = image.get_width();
+          const height = image.get_height();
+
+          // Render the image onto the canvas
+          const canvas = canvasRef.current;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            const imageData = ctx.createImageData(width, height);
+            
+            await new Promise<void>((resolve, reject) => {
+              image.display(imageData, (displayData: any) => {
+                if (!displayData) {
+                  return reject(new Error('HEIF processing error'));
+                }
+            
+                resolve();
+              });
+            });
+            
+            // canvas.width = width;
+            // canvas.height = height;
+
+            // const imageData = heifImage.toImageData();
+            ctx.putImageData(imageData, 0, 0);
+          }
+        } catch (error) {
+          console.error('Error decoding HEIC image:', error);
+        }
+      }
+    };
+
+    renderHeicImage();
+  }, [photoUrl, isHeic]);
+
 
   const handleDoubleClick = () => {
     props.onSetLoupeViewMediaItemId(props.mediaItem.googleMediaItemId);
@@ -95,7 +161,6 @@ const GridCell = (props: GridCellProps) => {
 
   const metadataJsx: JSX.Element | null = getMetadataJsx();
 
-  const photoUrl = getPhotoUrl(mediaItem);
 
   let borderAttr: string = borderSizeStr + ' ';
   borderAttr += props.isSelected ? ' solid blue' : ' solid white';
@@ -127,12 +192,15 @@ const GridCell = (props: GridCellProps) => {
         onClick={handleClicks}
       >
         {metadataJsx}
-        <img
+        {isHeic ? (
+          <canvas ref={canvasRef} style={{ width: '100%', height: '100%' }} />
+        ) : (<img
           src={photoUrl}
           width={widthAttribute}
           height={imgHeightAttribute}
           loading='lazy'
         />
+        )}
       </div>
     </Tooltip>
   );
