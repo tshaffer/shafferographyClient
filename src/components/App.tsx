@@ -18,6 +18,7 @@ import TopToolbar from './TopToolbar';
 import GridView from './GridView';
 import ImportFromLocalStorageDialog from './ImportFromLocalStorageDialog';
 import { uploadRawMedia } from '../controllers/rawMediaUploader';
+import UploadToGoogleDialog from './UploadToGoogleDialog';
 
 declare module 'react' {
   interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -47,6 +48,7 @@ const App = (props: AppProps) => {
   const [showSearchSpecDialog, setShowSearchSpecDialog] = React.useState(false);
   const [showImportFromTakeoutDialog, setShowImportFromTakeoutDialog] = React.useState(false);
   const [showImportFromLocalStorageDialog, setShowImportFromLocalStorageDialog] = React.useState(false);
+  const [showUploadToGoogleDialog, setShowUploadToGoogleDialog] = React.useState(false);
 
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [importing, setImporting] = useState(false);
@@ -230,12 +232,20 @@ const App = (props: AppProps) => {
     props.onImportFromLocalStorage(takeoutId);
   };
 
+  const handleUploadToGoogleDialog = (albumName: string) => {
+    console.log('handleUploadToGoogleDialog', albumName);
+  };
+
   const handleCloseSearchSpecDialog = () => {
     setShowSearchSpecDialog(false);
   };
 
   const handleCloseImportFromTakeoutDialog = () => {
     setShowImportFromTakeoutDialog(false);
+  };
+
+  const handleCloseUploadToGoogleDialogDialog = () => {
+    setShowUploadToGoogleDialog(false);
   };
 
   // const handleCloseImportFromLocalStorageDialog = () => {
@@ -288,7 +298,6 @@ const App = (props: AppProps) => {
   const handleImportFilesSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const files = Array.from(event.target.files);
-      console.log('Selected files:', files);
       setSelectedFiles(event.target.files);
       setError(null); // Reset error message when new folder is selected
       setSuccessMessage(null); // Reset success message
@@ -296,13 +305,10 @@ const App = (props: AppProps) => {
   };
 
   const handleImport = async () => {
-    console.log('handleImport');
     if (!selectedFiles) {
       setError('Please select file(s) first');
       return;
     }
-
-    console.log('selectedFiles', selectedFiles);
 
     setImporting(true);
     setError(null);
@@ -334,7 +340,6 @@ const App = (props: AppProps) => {
   };
 
   const renderImport = (): JSX.Element => {
-    console.log('renderImport');
     return (
       <div>
         <input
@@ -357,8 +362,6 @@ const App = (props: AppProps) => {
 
   const getLeftColumn = (): JSX.Element => {
 
-    console.log('folderInputRef', folderInputRef);
-
     return (
       <div className='leftColumnStyle'>
         <Keywords />
@@ -374,6 +377,12 @@ const App = (props: AppProps) => {
           onClose={handleCloseImportFromTakeoutDialog}
         />
         {renderImport()}
+        <Button onClick={() => setShowUploadToGoogleDialog(true)}>Upload to Google</Button>
+        <UploadToGoogleDialog
+          open={showUploadToGoogleDialog}
+          onUploadToGoogle={handleUploadToGoogleDialog}
+          onClose={handleCloseUploadToGoogleDialogDialog}
+        />
       </div>
     );
   };

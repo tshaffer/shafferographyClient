@@ -14,6 +14,7 @@ export * from './SurveyViewGridItem';
 export * from './SurveyViewImage';
 export * from './SurveyViewImageContainer';
 export * from './TopToolbar';
+export * from './UploadToGoogleDialog';
 export * from './ZoomGroup';
 
 
