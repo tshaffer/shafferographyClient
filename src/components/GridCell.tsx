@@ -94,12 +94,12 @@ const GridCell = (props: GridCellProps) => {
 
 
   const handleDoubleClick = () => {
-    props.onSetLoupeViewMediaItemId(props.mediaItem.googleMediaItemId);
+    props.onSetLoupeViewMediaItemId(props.mediaItem.uniqueId);
     props.onSetPhotoLayoutRedux(PhotoLayout.Loupe);
   };
 
   const handleClickPhoto = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
-    props.onClickPhoto(props.mediaItem.googleMediaItemId, e.metaKey, e.shiftKey);
+    props.onClickPhoto(props.mediaItem.uniqueId, e.metaKey, e.shiftKey);
   };
 
   const handleClicks = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {

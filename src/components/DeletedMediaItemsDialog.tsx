@@ -35,9 +35,9 @@ const DeletedMediaItemsDialog = (props: DeletedMediaItemsDialogProps) => {
     onClose();
   };
 
-  const handleRemoveDeletedMediaItem = (googleMediaItemId: string) => {
-    console.log('handleRemoveDeletedMediaItem: ', googleMediaItemId);
-    onRemoveDeletedMediaItem(googleMediaItemId);
+  const handleRemoveDeletedMediaItem = (uniqueId: string) => {
+    console.log('handleRemoveDeletedMediaItem: ', uniqueId);
+    onRemoveDeletedMediaItem(uniqueId);
   };
 
   const deletedMediaItems = cloneDeep(props.deletedMediaItems);
@@ -66,10 +66,10 @@ const DeletedMediaItemsDialog = (props: DeletedMediaItemsDialogProps) => {
                 const labelId = `checkbox-list-label-${mediaItem.fileName}`;
                 return (
                   <ListItem
-                    key={mediaItem.googleMediaItemId}
+                    key={mediaItem.uniqueId}
                   // disablePadding
                   >
-                    <ListItemButton role={undefined} onClick={() => { handleRemoveDeletedMediaItem(mediaItem.googleMediaItemId); }} dense>
+                    <ListItemButton role={undefined} onClick={() => { handleRemoveDeletedMediaItem(mediaItem.uniqueId); }} dense>
                       <ListItemIcon>
                         <RemoveCircleIcon />
                       </ListItemIcon>

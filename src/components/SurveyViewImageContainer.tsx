@@ -42,11 +42,11 @@ function SurveyViewImageContainer(props: SurveyViewImageContainerProps) {
   const [openDialog, setOpenDialog] = React.useState(false);
 
   const handleSurveyViewImageZoomIn = () => {
-    props.onSetMediaItemZoomFactor(props.mediaItem.googleMediaItemId, props.mediaItemZoomFactor + 0.2);
+    props.onSetMediaItemZoomFactor(props.mediaItem.uniqueId, props.mediaItemZoomFactor + 0.2);
   };
 
   const handleSurveyViewImageZoomOut = () => {
-    props.onSetMediaItemZoomFactor(props.mediaItem.googleMediaItemId, props.mediaItemZoomFactor - 0.2);
+    props.onSetMediaItemZoomFactor(props.mediaItem.uniqueId, props.mediaItemZoomFactor - 0.2);
   };
 
   const handleCloseDialog = () => {
@@ -59,7 +59,7 @@ function SurveyViewImageContainer(props: SurveyViewImageContainerProps) {
 
   const handleConfirmDelete = () => {
     setOpenDialog(false);
-    props.onDeleteSurveyViewImageContainerItem(props.mediaItem.googleMediaItemId);
+    props.onDeleteSurveyViewImageContainerItem(props.mediaItem.uniqueId);
   };
 
   const photoUrl = getPhotoUrl(props.mediaItem);
@@ -79,7 +79,7 @@ function SurveyViewImageContainer(props: SurveyViewImageContainerProps) {
         />
       </div>
       <CardMedia
-        id={props.mediaItem.googleMediaItemId}
+        id={props.mediaItem.uniqueId}
         className='survey-image-container'
         title={photoUrl}
         sx={cardMediaStyle}
@@ -119,7 +119,7 @@ function mapStateToProps(state: any, ownProps: any) {
   return {
     mediaItem: ownProps.mediaItem,
     surveyModeZoomFactor: getSurveyModeZoomFactor(state),
-    mediaItemZoomFactor: getMediaItemZoomFactor(state, ownProps.mediaItem.googleMediaItemId),
+    mediaItemZoomFactor: getMediaItemZoomFactor(state, ownProps.mediaItem.uniqueId),
   };
 }
 

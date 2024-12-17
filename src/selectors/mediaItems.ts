@@ -8,13 +8,13 @@ export const getMediaItems = (state: TedTaggerState): MediaItem[] => {
 };
 
 export const getMediaItemIds = (state: TedTaggerState): string[] => {
-  return state.mediaItemsState.mediaItems.map((mediaItem: MediaItem) => mediaItem.googleMediaItemId);
+  return state.mediaItemsState.mediaItems.map((mediaItem: MediaItem) => mediaItem.uniqueId);
 };
 
-export const getMediaItemById = (state: TedTaggerState, googleMediaItemId: string): MediaItem | null => {
+export const getMediaItemById = (state: TedTaggerState, uniqueId: string): MediaItem | null => {
 
   for (const mediaItem of state.mediaItemsState.mediaItems) {
-    if (mediaItem.googleMediaItemId === googleMediaItemId) {
+    if (mediaItem.uniqueId === uniqueId) {
       return mediaItem;
     }
   }

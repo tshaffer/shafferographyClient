@@ -16,31 +16,31 @@ export const SET_LAST_CLICKED_ID = 'SET_LAST_CLICKED_ID';
 // ------------------------------------
 
 interface SelectMediaItemPayload {
-  googleMediaItemid: string;
+  uniqueId: string;
 }
 
 export const selectMediaItem = (
-  googleMediaItemid: string,
+  uniqueId: string,
 ): any => {
   return {
     type: SELECT_MEDIA_ITEM,
     payload: {
-      googleMediaItemid
+      uniqueId
     }
   };
 };
 
 interface DeselectMediaItemPayload {
-  googleMediaItemid: string;
+  uniqueId: string;
 }
 
 export const deselectMediaItem = (
-  googleMediaItemid: string,
+  uniqueId: string,
 ): any => {
   return {
     type: DESELECT_MEDIA_ITEM,
     payload: {
-      googleMediaItemid
+      uniqueId
     }
   };
 };
@@ -53,16 +53,16 @@ export const clearMediaItemSelection = (
 };
 
 interface SetLastClickedIdPayload {
-  googleMediaItemid: string | null;
+  uniqueId: string | null;
 }
 
 export const setLastClickedId = (
-  googleMediaItemid: string | null,
+  uniqueId: string | null,
 ): any => {
   return {
     type: SET_LAST_CLICKED_ID,
     payload: {
-      googleMediaItemid
+      uniqueId
     }
   };
 };
@@ -92,17 +92,17 @@ export const selectedMediaItemsStateReducer = (
     }
     case SET_LAST_CLICKED_ID: {
       const newState = cloneDeep(state) as SelectedMediaItemsState;
-      newState.lastClickedId = action.payload.googleMediaItemid;
+      newState.lastClickedId = action.payload.uniqueId;
       return newState;
     }
     case SELECT_MEDIA_ITEM: {
       const newState = cloneDeep(state) as SelectedMediaItemsState;
-      newState.selectedMediaItemIds.push(action.payload.googleMediaItemid);
+      newState.selectedMediaItemIds.push(action.payload.uniqueId);
       return newState;
     }
     case DESELECT_MEDIA_ITEM: {
       const newState = cloneDeep(state) as SelectedMediaItemsState;
-      newState.selectedMediaItemIds = newState.selectedMediaItemIds.filter((selectedId) => selectedId !== action.payload.googleMediaItemid);
+      newState.selectedMediaItemIds = newState.selectedMediaItemIds.filter((selectedId) => selectedId !== action.payload.uniqueId);
       return newState;
     }
     default:

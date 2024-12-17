@@ -21,7 +21,7 @@ function SurveyViewImage(props: SurveyViewImageProps) {
 
   const photoUrl = getPhotoUrl(props.mediaItem);
 
-  const elementId: string = 'surveyImage' + props.mediaItem.googleMediaItemId;
+  const elementId: string = 'surveyImage' + props.mediaItem.uniqueId;
   const imageElement = document.getElementById(elementId) as HTMLImageElement | null;
   const zoomFactor = props.surveyModeZoomFactor * props.mediaItemZoomFactor;
   if (imageElement) {
@@ -42,7 +42,7 @@ function mapStateToProps(state: any, ownProps: any) {
   return {
     mediaItem: ownProps.mediaItem,
     surveyModeZoomFactor: getSurveyModeZoomFactor(state),
-    mediaItemZoomFactor: getMediaItemZoomFactor(state, ownProps.mediaItem.googleMediaItemId),
+    mediaItemZoomFactor: getMediaItemZoomFactor(state, ownProps.mediaItem.uniqueId),
   };
 }
 
