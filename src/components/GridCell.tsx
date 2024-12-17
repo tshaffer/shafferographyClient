@@ -2,9 +2,6 @@ import * as React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
-// import * as heif from 'libheif-js'; // HEIC decoding library
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-// const libheif = require('libheif-js');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const libheif = require('libheif-js/wasm-bundle');
 
@@ -38,7 +35,6 @@ export interface GridCellProps extends GridCellPropsFromParent {
 const GridCell = (props: GridCellProps) => {
 
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
-  const imgRef = React.useRef<HTMLImageElement | null>(null);
 
   const { fileName } = props.mediaItem;
   const isHeic = fileName.toLowerCase().endsWith('.heic');
@@ -54,7 +50,6 @@ const GridCell = (props: GridCellProps) => {
       if (isHeic && canvasRef.current) {
         try {
 
-          debugger;
           // Fetch the HEIC file from the server as ArrayBuffer
           const response = await fetch(photoUrl);
           if (!response.ok) throw new Error('Failed to fetch HEIC file');
@@ -69,28 +64,25 @@ const GridCell = (props: GridCellProps) => {
           const width = image.get_width();
           const height = image.get_height();
 
-          // Render the image onto the canvas
           const canvas = canvasRef.current;
-          const ctx = canvas.getContext('2d');
-          if (ctx) {
-            const imageData = ctx.createImageData(width, height);
-            
-            await new Promise<void>((resolve, reject) => {
-              image.display(imageData, (displayData: any) => {
-                if (!displayData) {
-                  return reject(new Error('HEIF processing error'));
-                }
-            
-                resolve();
-              });
-            });
-            
-            // canvas.width = width;
-            // canvas.height = height;
 
-            // const imageData = heifImage.toImageData();
-            ctx.putImageData(imageData, 0, 0);
-          }
+          canvas.width = width;
+          canvas.height = height;
+
+          const context = canvas.getContext('2d')!;
+          const imageData = context!.createImageData(width, height);
+
+          await new Promise<void>((resolve, reject) => {
+            image.display(imageData, (displayData: any) => {
+              if (!displayData) {
+                return reject(new Error('HEIF processing error'));
+              }
+
+              resolve();
+            });
+          });
+
+          context.putImageData(imageData, 0, 0);
         } catch (error) {
           console.error('Error decoding HEIC image:', error);
         }
