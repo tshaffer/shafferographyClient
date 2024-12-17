@@ -19,7 +19,7 @@ import GridView from './GridView';
 import ImportFromLocalStorageDialog from './ImportFromLocalStorageDialog';
 import { uploadRawMedia } from '../controllers/rawMediaUploader';
 import UploadToGoogleDialog from './UploadToGoogleDialog';
-import { uploadToGoogle } from '../controllers/googleUploader';
+import { uploadToGoogle, getAlbumNamesWherePeopleNotRetrieved } from '../controllers/googleUploader';
 
 declare module 'react' {
   interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -335,6 +335,12 @@ const App = (props: AppProps) => {
 
   };
 
+  const handleRetrievePeople = async () => {
+    console.log('handleRetrievePeople');
+    const albumNames = await getAlbumNamesWherePeopleNotRetrieved();
+    console.log('albumNames', albumNames);
+  };
+
   const handleUploadToGoogle = async (albumName: string) => {
     console.log('handleUploadToGoogle', albumName);
 
@@ -400,6 +406,7 @@ const App = (props: AppProps) => {
         />
         {renderImport()}
         <Button onClick={() => setShowUploadToGoogleDialog(true)}>Upload to Google</Button>
+        <Button onClick={handleRetrievePeople}>Retrieve People</Button>
         <UploadToGoogleDialog
           open={showUploadToGoogleDialog}
           onUploadToGoogle={handleUploadToGoogle}
