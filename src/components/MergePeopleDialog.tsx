@@ -5,7 +5,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import Box from '@mui/material/Box';
 
-import { getAppInitialized, getTakeouts } from '../selectors';
+import { getAppInitialized } from '../selectors';
 import { Button, DialogActions, DialogContent } from '@mui/material';
 
 export interface MergePeopleDialogPropsFromParent {
@@ -75,7 +75,7 @@ const MergePeopleDialog = (props: MergePeopleDialogProps) => {
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button onClick={handleMerge} autoFocus>
+        <Button onClick={handleMerge} autoFocus disabled={!selectedFiles || selectedFiles.length === 0}>
           Merge
         </Button>
       </DialogActions>
@@ -86,7 +86,6 @@ const MergePeopleDialog = (props: MergePeopleDialogProps) => {
 function mapStateToProps(state: any) {
   return {
     appInitialized: getAppInitialized(state),
-    takeouts: getTakeouts(state),
   };
 }
 
