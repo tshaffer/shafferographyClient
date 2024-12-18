@@ -323,7 +323,8 @@ const App = (props: AppProps) => {
           onImportFromTakeout={handleImportFromTakeout}
           onClose={handleCloseImportFromTakeoutDialog}
         />
-        <Button onClick={() => setShowUploadToGoogleDialog(true)}>Upload to Google</Button>
+        <Button onClick={() => setShowUploadToGoogleDialog(true)} disabled={props.selectedMediaItems.length === 0}
+        >Upload to Google</Button>
         <UploadToGoogleDialog
           open={showUploadToGoogleDialog}
           onUploadToGoogle={handleUploadToGoogle}
