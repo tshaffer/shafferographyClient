@@ -290,58 +290,6 @@ const App = (props: AppProps) => {
     setShowUploadToGoogleDialog(false);
   };
 
-  // const handleCloseImportFromLocalStorageDialog = () => {
-  //   setShowImportFromLocalStorageDialog(false);
-  // };
-
-  // Handle folder selection
-  // const handleFolderSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   if (event.target.files) {
-  //     console.log('event.target.files', event.target.files);
-  //     setSelectedFiles(event.target.files);
-  //     setError(null); // Reset error message when new folder is selected
-  //     setSuccessMessage(null); // Reset success message
-  //   }
-  // };
-
-  // Handle upload on button press
-  const handleUpload = async () => {
-    if (!selectedFiles) {
-      setError('Please select a folder first');
-      return;
-    }
-  
-    setUploading(true);
-    setError(null);
-    setSuccessMessage(null);
-  
-    const formData = new FormData();
-    const allowedExtensions = ['.json']; // Allowed file extensions
-  
-    // Append only files with allowed extensions
-    Array.from(selectedFiles).forEach((file) => {
-      const fileExtension = file.name.split('.').pop()?.toLowerCase();
-      if (fileExtension && allowedExtensions.includes(`.${fileExtension}`)) {
-        formData.append('files', file, file.webkitRelativePath);
-      }
-    });
-  
-    try {
-      const response = await uploadRawMedia(formData);
-  
-      if (response.ok) {
-        setSuccessMessage('Folder uploaded successfully!');
-      } else {
-        const errorMessage = await response.text();
-        setError(`Upload failed: ${errorMessage}`);
-      }
-    } catch (err) {
-      setError(`Upload failed: ${err}`);
-    } finally {
-      setUploading(false);
-    }
-  };
-  
   const handleImportFilesSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const files = Array.from(event.target.files);
@@ -352,6 +300,9 @@ const App = (props: AppProps) => {
   };
 
   const handleImport = async () => {
+
+    debugger;
+    
     if (!selectedFiles) {
       setError('Please select file(s) first');
       return;
@@ -438,8 +389,7 @@ const App = (props: AppProps) => {
     );
   };
 
-  const renderLeftColumn = (): JSX.Element => {
-
+  const renderLeftPanel = (): JSX.Element => {
     return (
       <div className='leftColumnStyle'>
         <Keywords />
@@ -472,31 +422,6 @@ const App = (props: AppProps) => {
     );
   };
 
-  /* code for old import functions
-        <Button onClick={() => setShowImportFromLocalStorageDialog(true)}>Import from Local Storage</Button>
-        <ImportFromLocalStorageDialog
-          open={showImportFromLocalStorageDialog}
-          onImportFromLocalStorage={handleImportFromLocalStorage}
-          onClose={handleCloseImportFromLocalStorageDialog}
-        />
-        <div>
-          <input
-            type="file"
-            webkitdirectory=""
-            id="folderInput"
-            name="file" 
-            multiple
-            onChange={handleFolderSelect}
-            ref={folderInputRef}
-            style={{ marginBottom: '1rem' }}
-          />
-          <button onClick={handleUpload} disabled={uploading}>
-            {uploading ? 'Uploading...' : 'Upload Folder'}
-          </button>
-          {error && <p style={{ color: 'red' }}>{error}</p>}
-          {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
-        </div>
-  */
   const getPhotoDisplay = (): JSX.Element => {
     if (props.photoLayout === PhotoLayout.Loupe) {
       return (
@@ -517,7 +442,7 @@ const App = (props: AppProps) => {
     } else {
       return (
         <React.Fragment>
-          {renderLeftColumn()}
+          {renderLeftPanel()}
           <div id='centerColumn' className='centerColumnStyle'>
             <GridView />
           </div>
