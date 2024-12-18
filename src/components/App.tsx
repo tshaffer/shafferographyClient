@@ -11,6 +11,7 @@ import { Button } from '@mui/material';
 import Keywords from './Keywords';
 import SearchSpecDialog from './SearchSpecDialog';
 import ImportFromTakeoutDialog from './ImportFromTakeoutDialog';
+import MergePeopleDialog from './MergePeopleDialog';
 import LoupeViewController from './LoupeViewController';
 import { MediaItem, PhotoLayout } from '../types';
 import SurveyView from './SurveyView';
@@ -39,6 +40,7 @@ export interface AppProps {
   keywordRootNodeId: string;
   onImportFromTakeout: (id: string) => void;
   onImportFromLocalStorage: (folder: string) => void;
+  // onMergePeople: (files: any) => void;
 }
 
 const App = (props: AppProps) => {
@@ -47,6 +49,7 @@ const App = (props: AppProps) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [showSearchSpecDialog, setShowSearchSpecDialog] = React.useState(false);
   const [showImportFromTakeoutDialog, setShowImportFromTakeoutDialog] = React.useState(false);
+  const [showMergePeopleDialog, setShowMergePeopleDialog] = React.useState(false);
   const [showImportFromLocalStorageDialog, setShowImportFromLocalStorageDialog] = React.useState(false);
   const [showUploadToGoogleDialog, setShowUploadToGoogleDialog] = React.useState(false);
 
@@ -229,6 +232,11 @@ const App = (props: AppProps) => {
     props.onImportFromTakeout(takeoutId);
   };
 
+  const handleMergePeople = (takeoutId: string) => {
+    console.log('handleMergePeople', takeoutId);
+    // props.onImportFromTakeout(takeoutId);
+  };
+
   const handleImportFromLocalStorage = (takeoutId: string) => {
     props.onImportFromLocalStorage(takeoutId);
   };
@@ -241,6 +249,10 @@ const App = (props: AppProps) => {
     setShowImportFromTakeoutDialog(false);
   };
 
+  const handleCloseMergePeopleDialog = () => {
+    setShowMergePeopleDialog(false);
+  };
+
   const handleCloseUploadToGoogleDialogDialog = () => {
     setShowUploadToGoogleDialog(false);
   };
@@ -250,13 +262,14 @@ const App = (props: AppProps) => {
   // };
 
   // Handle folder selection
-  // const handleFolderSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   if (event.target.files) {
-  //     setSelectedFiles(event.target.files);
-  //     setError(null); // Reset error message when new folder is selected
-  //     setSuccessMessage(null); // Reset success message
-  //   }
-  // };
+  const handleFolderSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      console.log('event.target.files', event.target.files);
+      setSelectedFiles(event.target.files);
+      setError(null); // Reset error message when new folder is selected
+      setSuccessMessage(null); // Reset success message
+    }
+  };
 
   // Handle upload on button press
   // const handleUpload = async () => {
@@ -264,21 +277,25 @@ const App = (props: AppProps) => {
   //     setError('Please select a folder first');
   //     return;
   //   }
-
+  
   //   setUploading(true);
   //   setError(null);
   //   setSuccessMessage(null);
-
+  
   //   const formData = new FormData();
-
-  //   // Append all files in the folder to the FormData object
+  //   const allowedExtensions = ['.json']; // Allowed file extensions
+  
+  //   // Append only files with allowed extensions
   //   Array.from(selectedFiles).forEach((file) => {
-  //     formData.append('files', file, file.webkitRelativePath);
+  //     const fileExtension = file.name.split('.').pop()?.toLowerCase();
+  //     if (fileExtension && allowedExtensions.includes(`.${fileExtension}`)) {
+  //       formData.append('files', file, file.webkitRelativePath);
+  //     }
   //   });
-
+  
   //   try {
   //     const response = await uploadRawMedia(formData);
-
+  
   //     if (response.ok) {
   //       setSuccessMessage('Folder uploaded successfully!');
   //     } else {
@@ -291,7 +308,7 @@ const App = (props: AppProps) => {
   //     setUploading(false);
   //   }
   // };
-
+  
   const handleImportFilesSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const files = Array.from(event.target.files);
@@ -388,7 +405,29 @@ const App = (props: AppProps) => {
     );
   };
 
-  const getLeftColumn = (): JSX.Element => {
+  // const renderMergePeople = (): JSX.Element => {
+  //   return (
+  //     <div>
+  //       <input
+  //         type="file"
+  //         webkitdirectory=""
+  //         id="folderInput"
+  //         name="file"
+  //         multiple
+  //         onChange={handleFolderSelect}
+  //         ref={folderInputRef}
+  //         style={{ marginBottom: '1rem' }}
+  //       />
+  //       <button onClick={handleUpload} disabled={uploading}>
+  //         {uploading ? 'Uploading...' : 'Upload Folder'}
+  //       </button>
+  //       {error && <p style={{ color: 'red' }}>{error}</p>}
+  //       {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
+  //     </div>
+  //   );
+  // };
+
+  const renderLeftColumn = (): JSX.Element => {
 
     return (
       <div className='leftColumnStyle'>
@@ -406,11 +445,17 @@ const App = (props: AppProps) => {
         />
         {renderImport()}
         <Button onClick={() => setShowUploadToGoogleDialog(true)}>Upload to Google</Button>
-        <Button onClick={handleRetrievePeople}>Retrieve People</Button>
         <UploadToGoogleDialog
           open={showUploadToGoogleDialog}
           onUploadToGoogle={handleUploadToGoogle}
           onClose={handleCloseUploadToGoogleDialogDialog}
+        />
+        <Button onClick={handleRetrievePeople}>Retrieve People</Button>
+        <Button onClick={() => setShowMergePeopleDialog(true)}>Merge People</Button>
+        <MergePeopleDialog
+          open={showMergePeopleDialog}
+          onMergePeople={handleMergePeople}
+          onClose={handleCloseMergePeopleDialog}
         />
       </div>
     );
@@ -461,7 +506,7 @@ const App = (props: AppProps) => {
     } else {
       return (
         <React.Fragment>
-          {getLeftColumn()}
+          {renderLeftColumn()}
           <div id='centerColumn' className='centerColumnStyle'>
             <GridView />
           </div>
