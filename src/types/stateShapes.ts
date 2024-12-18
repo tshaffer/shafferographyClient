@@ -12,7 +12,6 @@ import {
 export interface TedTaggerState {
   appState: AppState;
   keywordsState: KeywordsState;
-  localStorageState: LocalStorageState;
   mediaItemsState: MediaItemsState;
   photoViewSpec: PhotoViewSpec;
   searchUIState: SearchUIState;

@@ -1,9 +1,9 @@
-import React, { FieldsetHTMLAttributes, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import '../styles/TedTagger.css';
-import { loadMediaItems, loadKeywordData, loadTakeouts, importFromTakeout, loadDeletedMediaItems, loadLocalStorageFolders, importFromLocalStorage } from '../controllers';
+import { loadMediaItems, loadKeywordData, loadTakeouts, importFromTakeout, loadDeletedMediaItems } from '../controllers';
 import { TedTaggerDispatch, setAppInitialized } from '../models';
 import { getKeywordRootNodeId, getPhotoLayout, getSelectedMediaItems } from '../selectors';
 import { Button } from '@mui/material';
@@ -17,8 +17,6 @@ import { MediaItem, PhotoLayout } from '../types';
 import SurveyView from './SurveyView';
 import TopToolbar from './TopToolbar';
 import GridView from './GridView';
-import ImportFromLocalStorageDialog from './ImportFromLocalStorageDialog';
-import { uploadRawMedia } from '../controllers/rawMediaUploader';
 import UploadToGoogleDialog from './UploadToGoogleDialog';
 import { uploadToGoogle, getAlbumNamesWherePeopleNotRetrieved } from '../controllers';
 import { uploadPeopleTakeouts } from '../controllers';
@@ -36,12 +34,9 @@ export interface AppProps {
   onLoadMediaItems: () => any;
   onLoadDeletedMediaItems: () => any;
   onLoadTakeouts: () => any;
-  onLoadLocalStorages: () => any;
   onSetAppInitialized: () => any;
   keywordRootNodeId: string;
   onImportFromTakeout: (id: string) => void;
-  onImportFromLocalStorage: (folder: string) => void;
-  // onMergePeople: (takeoutFiles: FileList) => void;
 }
 
 const App = (props: AppProps) => {
@@ -51,12 +46,9 @@ const App = (props: AppProps) => {
   const [showSearchSpecDialog, setShowSearchSpecDialog] = React.useState(false);
   const [showImportFromTakeoutDialog, setShowImportFromTakeoutDialog] = React.useState(false);
   const [showMergePeopleDialog, setShowMergePeopleDialog] = React.useState(false);
-  const [showImportFromLocalStorageDialog, setShowImportFromLocalStorageDialog] = React.useState(false);
   const [showUploadToGoogleDialog, setShowUploadToGoogleDialog] = React.useState(false);
 
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
-  const [importing, setImporting] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [uploadingToGoogle, setUploadingToGoogle] = useState(false);
   const [mergingPeople, setMergingPeople] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -215,8 +207,6 @@ const App = (props: AppProps) => {
       .then(function () {
         return props.onLoadTakeouts();
       }).then(function () {
-        return props.onLoadLocalStorages();
-      }).then(function () {
         return props.onLoadMediaItems();
       }).then(function () {
         return props.onLoadDeletedMediaItems();
@@ -270,10 +260,6 @@ const App = (props: AppProps) => {
 
   };
 
-  const handleImportFromLocalStorage = (takeoutId: string) => {
-    props.onImportFromLocalStorage(takeoutId);
-  };
-
   const handleCloseSearchSpecDialog = () => {
     setShowSearchSpecDialog(false);
   };
@@ -288,52 +274,6 @@ const App = (props: AppProps) => {
 
   const handleCloseUploadToGoogleDialogDialog = () => {
     setShowUploadToGoogleDialog(false);
-  };
-
-  const handleImportFilesSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      const files = Array.from(event.target.files);
-      setSelectedFiles(event.target.files);
-      setError(null); // Reset error message when new folder is selected
-      setSuccessMessage(null); // Reset success message
-    }
-  };
-
-  const handleImport = async () => {
-
-    debugger;
-    
-    if (!selectedFiles) {
-      setError('Please select file(s) first');
-      return;
-    }
-
-    setImporting(true);
-    setError(null);
-    setSuccessMessage(null);
-
-    const formData = new FormData();
-
-    // Append all files in the folder to the FormData object
-    Array.from(selectedFiles).forEach((file) => {
-      formData.append('files', file, file.name);
-    });
-
-    try {
-      const response = await uploadRawMedia(formData);
-
-      if (response.ok) {
-        setSuccessMessage('Import completed successfully!');
-      } else {
-        const errorMessage = await response.text();
-        setError(`Import failed: ${errorMessage}`);
-      }
-    } catch (err) {
-      setError(`Import failed: ${err}`);
-    } finally {
-      setImporting(false);
-    }
-
   };
 
   const handleRetrievePeople = async () => {
@@ -368,27 +308,6 @@ const App = (props: AppProps) => {
 
   };
 
-  const renderImport = (): JSX.Element => {
-    return (
-      <div>
-        <input
-          type="file"
-          accept=".jpg,.heic,image/jpeg,image/heic"
-          onChange={handleImportFilesSelect}
-          id="importFilesInput"
-          name="file"
-          multiple
-          style={{ marginBottom: '1rem' }}
-        />
-        <button onClick={handleImport} disabled={importing}>
-          {importing ? 'Importing...' : 'Import Files'}
-        </button>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
-      </div>
-    );
-  };
-
   const renderLeftPanel = (): JSX.Element => {
     return (
       <div className='leftColumnStyle'>
@@ -404,7 +323,6 @@ const App = (props: AppProps) => {
           onImportFromTakeout={handleImportFromTakeout}
           onClose={handleCloseImportFromTakeoutDialog}
         />
-        {renderImport()}
         <Button onClick={() => setShowUploadToGoogleDialog(true)}>Upload to Google</Button>
         <UploadToGoogleDialog
           open={showUploadToGoogleDialog}
@@ -422,7 +340,7 @@ const App = (props: AppProps) => {
     );
   };
 
-  const getPhotoDisplay = (): JSX.Element => {
+  const renderPhotoDisplay = (): JSX.Element => {
     if (props.photoLayout === PhotoLayout.Loupe) {
       return (
         <React.Fragment>
@@ -452,7 +370,7 @@ const App = (props: AppProps) => {
     }
   };
 
-  const photoDisplay: JSX.Element = getPhotoDisplay();
+  const photoDisplay: JSX.Element = renderPhotoDisplay();
 
   return (
     <div>
@@ -482,9 +400,7 @@ const mapDispatchToProps = (dispatch: TedTaggerDispatch) => {
     onLoadDeletedMediaItems: loadDeletedMediaItems,
     onSetAppInitialized: setAppInitialized,
     onLoadTakeouts: loadTakeouts,
-    onLoadLocalStorages: loadLocalStorageFolders,
     onImportFromTakeout: importFromTakeout,
-    onImportFromLocalStorage: importFromLocalStorage,
   }, dispatch);
 };
 

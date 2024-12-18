@@ -10,7 +10,6 @@ import { keywordsStateReducer } from './keywords';
 import { searchUIStateReducer } from './searchUI';
 import { takeoutsStateReducer } from './takeouts';
 import { photoViewSpecReducer } from './photoViewSpec';
-import { localStorageStateReducer } from './localStorage';
 
 // -----------------------------------------------------------------------
 // Reducers
@@ -23,7 +22,6 @@ export const rootReducer = combineReducers<TedTaggerState>({
   searchUIState: searchUIStateReducer,
   takeoutsState: takeoutsStateReducer,
   photoViewSpec: photoViewSpecReducer,
-  localStorageState: localStorageStateReducer,
 });
 
 // -----------------------------------------------------------------------
