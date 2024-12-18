@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { FieldsetHTMLAttributes, useEffect, useRef, useState } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
@@ -40,7 +40,7 @@ export interface AppProps {
   keywordRootNodeId: string;
   onImportFromTakeout: (id: string) => void;
   onImportFromLocalStorage: (folder: string) => void;
-  // onMergePeople: (files: any) => void;
+  // onMergePeople: (takeoutFiles: FileList) => void;
 }
 
 const App = (props: AppProps) => {
@@ -55,6 +55,7 @@ const App = (props: AppProps) => {
 
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [importing, setImporting] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [uploadingToGoogle, setUploadingToGoogle] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -232,8 +233,8 @@ const App = (props: AppProps) => {
     props.onImportFromTakeout(takeoutId);
   };
 
-  const handleMergePeople = (takeoutId: string) => {
-    console.log('handleMergePeople', takeoutId);
+  const handleMergePeople = (takeoutFiles: FileList) => {
+    console.log('handleMergePeople', takeoutFiles);
     // props.onImportFromTakeout(takeoutId);
   };
 
@@ -262,52 +263,52 @@ const App = (props: AppProps) => {
   // };
 
   // Handle folder selection
-  const handleFolderSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      console.log('event.target.files', event.target.files);
-      setSelectedFiles(event.target.files);
-      setError(null); // Reset error message when new folder is selected
-      setSuccessMessage(null); // Reset success message
-    }
-  };
-
-  // Handle upload on button press
-  // const handleUpload = async () => {
-  //   if (!selectedFiles) {
-  //     setError('Please select a folder first');
-  //     return;
-  //   }
-  
-  //   setUploading(true);
-  //   setError(null);
-  //   setSuccessMessage(null);
-  
-  //   const formData = new FormData();
-  //   const allowedExtensions = ['.json']; // Allowed file extensions
-  
-  //   // Append only files with allowed extensions
-  //   Array.from(selectedFiles).forEach((file) => {
-  //     const fileExtension = file.name.split('.').pop()?.toLowerCase();
-  //     if (fileExtension && allowedExtensions.includes(`.${fileExtension}`)) {
-  //       formData.append('files', file, file.webkitRelativePath);
-  //     }
-  //   });
-  
-  //   try {
-  //     const response = await uploadRawMedia(formData);
-  
-  //     if (response.ok) {
-  //       setSuccessMessage('Folder uploaded successfully!');
-  //     } else {
-  //       const errorMessage = await response.text();
-  //       setError(`Upload failed: ${errorMessage}`);
-  //     }
-  //   } catch (err) {
-  //     setError(`Upload failed: ${err}`);
-  //   } finally {
-  //     setUploading(false);
+  // const handleFolderSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   if (event.target.files) {
+  //     console.log('event.target.files', event.target.files);
+  //     setSelectedFiles(event.target.files);
+  //     setError(null); // Reset error message when new folder is selected
+  //     setSuccessMessage(null); // Reset success message
   //   }
   // };
+
+  // Handle upload on button press
+  const handleUpload = async () => {
+    if (!selectedFiles) {
+      setError('Please select a folder first');
+      return;
+    }
+  
+    setUploading(true);
+    setError(null);
+    setSuccessMessage(null);
+  
+    const formData = new FormData();
+    const allowedExtensions = ['.json']; // Allowed file extensions
+  
+    // Append only files with allowed extensions
+    Array.from(selectedFiles).forEach((file) => {
+      const fileExtension = file.name.split('.').pop()?.toLowerCase();
+      if (fileExtension && allowedExtensions.includes(`.${fileExtension}`)) {
+        formData.append('files', file, file.webkitRelativePath);
+      }
+    });
+  
+    try {
+      const response = await uploadRawMedia(formData);
+  
+      if (response.ok) {
+        setSuccessMessage('Folder uploaded successfully!');
+      } else {
+        const errorMessage = await response.text();
+        setError(`Upload failed: ${errorMessage}`);
+      }
+    } catch (err) {
+      setError(`Upload failed: ${err}`);
+    } finally {
+      setUploading(false);
+    }
+  };
   
   const handleImportFilesSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -404,28 +405,6 @@ const App = (props: AppProps) => {
       </div>
     );
   };
-
-  // const renderMergePeople = (): JSX.Element => {
-  //   return (
-  //     <div>
-  //       <input
-  //         type="file"
-  //         webkitdirectory=""
-  //         id="folderInput"
-  //         name="file"
-  //         multiple
-  //         onChange={handleFolderSelect}
-  //         ref={folderInputRef}
-  //         style={{ marginBottom: '1rem' }}
-  //       />
-  //       <button onClick={handleUpload} disabled={uploading}>
-  //         {uploading ? 'Uploading...' : 'Upload Folder'}
-  //       </button>
-  //       {error && <p style={{ color: 'red' }}>{error}</p>}
-  //       {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
-  //     </div>
-  //   );
-  // };
 
   const renderLeftColumn = (): JSX.Element => {
 
