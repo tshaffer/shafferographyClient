@@ -20,7 +20,8 @@ import GridView from './GridView';
 import ImportFromLocalStorageDialog from './ImportFromLocalStorageDialog';
 import { uploadRawMedia } from '../controllers/rawMediaUploader';
 import UploadToGoogleDialog from './UploadToGoogleDialog';
-import { uploadToGoogle, getAlbumNamesWherePeopleNotRetrieved } from '../controllers/googleUploader';
+import { uploadToGoogle, getAlbumNamesWherePeopleNotRetrieved } from '../controllers';
+import { uploadPeopleTakeouts } from '../controllers';
 
 declare module 'react' {
   interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -57,6 +58,7 @@ const App = (props: AppProps) => {
   const [importing, setImporting] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadingToGoogle, setUploadingToGoogle] = useState(false);
+  const [mergingPeople, setMergingPeople] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -233,9 +235,39 @@ const App = (props: AppProps) => {
     props.onImportFromTakeout(takeoutId);
   };
 
-  const handleMergePeople = (takeoutFiles: FileList) => {
-    console.log('handleMergePeople', takeoutFiles);
-    // props.onImportFromTakeout(takeoutId);
+  const handleMergePeople = async (peopleTakeoutFiles: FileList) => {
+    console.log('handleMergePeople', peopleTakeoutFiles);
+
+    setMergingPeople(true);
+    setError(null);
+    setSuccessMessage(null);
+
+    const formData = new FormData();
+    const allowedExtensions = ['.json']; // Allowed file extensions
+  
+    // Append only files with allowed extensions
+    Array.from(peopleTakeoutFiles).forEach((file) => {
+      const fileExtension = file.name.split('.').pop()?.toLowerCase();
+      if (fileExtension && allowedExtensions.includes(`.${fileExtension}`)) {
+        formData.append('files', file, file.webkitRelativePath);
+      }
+    });
+
+    try {
+      const response = await uploadPeopleTakeouts(formData);
+  
+      if (response.ok) {
+        setSuccessMessage('Folder uploaded successfully!');
+      } else {
+        const errorMessage = await response.text();
+        setError(`Upload failed: ${errorMessage}`);
+      }
+    } catch (err) {
+      setError(`Upload failed: ${err}`);
+    } finally {
+      setMergingPeople(false);
+    }
+
   };
 
   const handleImportFromLocalStorage = (takeoutId: string) => {
